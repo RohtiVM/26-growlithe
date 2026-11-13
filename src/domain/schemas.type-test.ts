@@ -3,7 +3,7 @@
  * Cada `@ts-expect-error` prova que um estado inválido NÃO compila.
  */
 import type { z } from "zod";
-import type { MissionRequirement, MissionLaunch } from "./schemas";
+import type { MissionRequirement, MissionLaunch, StaffMember, StoreId, CreateCheckpointInput } from "./schemas";
 import {
   defineAction,
   ScanQrInput,
@@ -77,3 +77,13 @@ const _okPurchase: MissionRequirement = { kind: "purchase_category", category: "
 const _badCategory: MissionRequirement = { kind: "purchase_category", category: "roupas" };
 // @ts-expect-error — missão relâmpago exige texto do push e multiplicador
 const _badFlash: MissionLaunch = { type: "flash" };
+
+/* Painel (spec 003): papel e loja andam juntos. */
+declare const storeId: StoreId;
+const _okLojista: StaffMember = { role: "lojista", userId, storeId };
+// @ts-expect-error — lojista sem loja não existe (D6)
+const _lojistaSemLoja: StaffMember = { role: "lojista", userId };
+// @ts-expect-error — "visitante" não é papel do painel
+const _papelInvalido: StaffMember = { role: "visitante", userId };
+// @ts-expect-error — o formulário de checkpoint não envia `id` (o servidor gera)
+const _cpComId: CreateCheckpointInput = { id: "x", storeId: null, label: "Palco", dynamicQr: false };

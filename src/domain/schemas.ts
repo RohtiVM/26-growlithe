@@ -610,3 +610,117 @@ export const JoinWaitlistInput = LandingLead.pick({
   consentLgpd: true,
 });
 export type JoinWaitlistInput = z.infer<typeof JoinWaitlistInput>;
+
+/* ------------------------------------------------------------------ */
+/* 10. Painel do shopping — admin e lojista (spec 003)                 */
+/* ------------------------------------------------------------------ */
+
+export const STAFF_ROLES = ["admin", "lojista"] as const;
+export const StaffRole = z.enum(STAFF_ROLES);
+export type StaffRole = z.infer<typeof StaffRole>;
+
+/** Lojista sempre trabalha numa loja; admin não fica preso a nenhuma (D1, D6). */
+export const StaffMember = z.discriminatedUnion("role", [
+  z.object({ role: z.literal("admin"), userId: UserId }),
+  z.object({ role: z.literal("lojista"), userId: UserId, storeId: StoreId }),
+]);
+export type StaffMember = z.infer<typeof StaffMember>;
+
+/** Ponto físico com QR Code do Growlithe. `storeId: null` = ponto do shopping (entrada, palco). */
+export const Checkpoint = z.object({
+  id: CheckpointId,
+  storeId: StoreId.nullable(),
+  label: z.string().trim().min(2, "Dê um nome ao ponto, como \"Entrada Norte\"").max(60),
+  dynamicQr: z.boolean(),
+  active: z.boolean(),
+});
+export type Checkpoint = z.infer<typeof Checkpoint>;
+
+/** O servidor gera `id`; todo checkpoint nasce ativo. */
+export const CreateCheckpointInput = Checkpoint.pick({ storeId: true, label: true, dynamicQr: true });
+export type CreateCheckpointInput = z.infer<typeof CreateCheckpointInput>;
+
+export const REDEMPTION_VALIDATION_ERRORS = ["already_used", "expired", "other_store", "admin_only"] as const;
+export type RedemptionValidationError = (typeof REDEMPTION_VALIDATION_ERRORS)[number];
+
+export const REDEMPTION_VALIDATION_MESSAGES = {
+  already_used: "Este cupom de resgate já foi usado. Peça ao visitante para conferir no app.",
+  expired: "Este cupom de resgate venceu. O visitante pode gerar outro no app.",
+  other_store: "Este cupom de resgate é de outra loja. Oriente o visitante a usá-lo lá.",
+  admin_only: "Este benefício é validado pelo balcão do shopping. Oriente o visitante a ir até lá.",
+} as const satisfies Record<RedemptionValidationError, string>;
+
+/** Loja dona do benefício; `null` = benefício do shopping (só o admin valida). */
+const benefitStoreId = (b: RewardBenefit): StoreId | null => {
+  switch (b.kind) {
+    case "discount_percent":
+    case "discount_fixed":
+    case "gift":
+      return b.storeId;
+    case "free_parking":
+      return null;
+    default:
+      return assertNever(b);
+  }
+};
+
+const refuse = (error: RedemptionValidationError): Result<null, RedemptionValidationError> => ({
+  ok: false,
+  error,
+  message: REDEMPTION_VALIDATION_MESSAGES[error],
+});
+
+/**
+ * Regra de quem pode validar qual cupom de resgate (critérios 15–18 da spec 003).
+ * Pura: a função Postgres `validate_redemption` aplica a mesma regra de forma atômica.
+ */
+export const checkRedemptionValidation = (
+  staff: StaffMember,
+  redemption: Redemption,
+  benefit: RewardBenefit,
+  now: Date,
+): Result<null, RedemptionValidationError> => {
+  switch (redemption.status) {
+    case "redeemed":
+      return refuse("already_used");
+    case "expired":
+      return refuse("expired");
+    case "reserved":
+      if (redemption.expiresAt <= now) return refuse("expired");
+      break;
+    default:
+      return assertNever(redemption);
+  }
+
+  switch (staff.role) {
+    case "admin":
+      return { ok: true, data: null };
+    case "lojista": {
+      const owner = benefitStoreId(benefit);
+      if (owner === null) return refuse("admin_only");
+      return owner === staff.storeId ? { ok: true, data: null } : refuse("other_store");
+    }
+    default:
+      return assertNever(staff);
+  }
+};
+
+const Count = z.number().int().nonnegative();
+
+export const VariantFunnel = z.object({ visits: Count, leads: Count });
+export type VariantFunnel = z.infer<typeof VariantFunnel>;
+
+export const DashboardMetrics = z.object({
+  checkinsToday: Count,
+  uniqueVisitors7d: Count,
+  /** Ordenado do mais para o menos escaneado. */
+  scansByCheckpoint: z.array(z.object({ checkpointId: CheckpointId, label: z.string(), scans: Count })),
+  missionsCompleted: Count,
+  redemptionsValidated: Count,
+  leads: z.object({ A: VariantFunnel, B: VariantFunnel }),
+});
+export type DashboardMetrics = z.infer<typeof DashboardMetrics>;
+
+/** Conversão da landing (leads ÷ visitas); `null` quando ainda não há visitas. */
+export const conversionRate = ({ visits, leads }: VariantFunnel): number | null =>
+  visits === 0 ? null : leads / visits;
