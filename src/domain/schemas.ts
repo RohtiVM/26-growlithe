@@ -174,6 +174,38 @@ export const Store = z.object({
 export type Store = z.infer<typeof Store>;
 
 /* ------------------------------------------------------------------ */
+/* 3c. Checkpoints — pontos físicos com QR Code                        */
+/* ------------------------------------------------------------------ */
+
+export const CHECKPOINT_KINDS = ["entrance", "store", "event", "spot"] as const;
+export const CheckpointKind = z.enum(CHECKPOINT_KINDS);
+export type CheckpointKind = z.infer<typeof CheckpointKind>;
+
+export const CHECKPOINT_KIND_LABELS = {
+  entrance: "Entrada (check-in)",
+  store: "Loja",
+  event: "Evento",
+  spot: "Ponto do shopping",
+} as const satisfies Record<CheckpointKind, string>;
+
+export const Checkpoint = z.object({
+  id: CheckpointId,
+  label: z.string().min(2).max(80),
+  kind: CheckpointKind,
+  /** `null` = ponto do próprio shopping (entrada, palco, corredor). */
+  storeId: StoreId.nullable(),
+  /** Pontos por escanear este ponto (1 vez por dia). */
+  scanPoints: z.number().int().nonnegative().max(500),
+  /** Pista mostrada na caça ao tesouro quando este é o próximo ponto. */
+  hint: z.string().max(140).nullable(),
+  active: z.boolean(),
+});
+export type Checkpoint = z.infer<typeof Checkpoint>;
+
+export const CreateCheckpointInput = Checkpoint.omit({ id: true, active: true });
+export type CreateCheckpointInput = z.infer<typeof CreateCheckpointInput>;
+
+/* ------------------------------------------------------------------ */
 /* 4. Missões                                                         */
 /* ------------------------------------------------------------------ */
 
@@ -443,6 +475,7 @@ export const RECEIPT_ERRORS = [
   "receipt_already_used",
   "receipt_outside_window",
   "mission_not_active",
+  "mission_already_completed",
 ] as const;
 export type ReceiptError = (typeof RECEIPT_ERRORS)[number];
 
@@ -453,7 +486,18 @@ export const RECEIPT_ERROR_MESSAGES = {
   receipt_already_used: "Esse cupom já foi usado no Growlithe.",
   receipt_outside_window: "Esse cupom é de antes do início da missão.",
   mission_not_active: "Essa missão já terminou. Fique de olho na próxima!",
+  mission_already_completed: "Você já completou essa missão. Fique de olho na próxima!",
 } as const satisfies Record<ReceiptError, string>;
+
+export type ReceiptSuccess = {
+  storeName: string;
+  category: StoreCategory;
+  pointsEarned: number;
+  multiplier: number;
+  /** De onde veio a conferência: só a chave do QR ou a consulta na SEFAZ. */
+  verifiedBy: "local" | "sefaz";
+  tierUp: Tier | null;
+};
 
 /* ------------------------------------------------------------------ */
 /* 7. Result + contratos de ação (front ⇄ back)                       */
@@ -486,8 +530,55 @@ export type ScanSuccess = {
   progress: MissionProgress[];
   /** Preenchido só quando o usuário subiu de nível neste scan. */
   tierUp: Tier | null;
+  checkpointLabel: string;
+  /** Missões concluídas por este scan. */
+  completedMissions: Array<{ title: string; points: number }>;
+  /** Caça ao tesouro: pista do próximo QR, quando houver. */
+  nextHint: string | null;
 };
 export type ScanResult = Result<ScanSuccess, ScanError>;
+
+/* Resgate de recompensa (visitante) e validação do cupom de resgate (lojista). */
+
+export const RedeemRewardInput = z.object({ rewardId: RewardId });
+export type RedeemRewardInput = z.infer<typeof RedeemRewardInput>;
+
+export const REDEEM_ERRORS = [
+  "reward_unavailable",
+  "insufficient_points",
+  "tier_locked",
+  "out_of_stock",
+] as const;
+export type RedeemError = (typeof REDEEM_ERRORS)[number];
+
+export const REDEEM_ERROR_MESSAGES = {
+  reward_unavailable: "Essa recompensa não está mais disponível.",
+  insufficient_points: "Você ainda não tem pontos suficientes. Complete mais missões!",
+  tier_locked: "Essa recompensa é exclusiva de um nível acima do seu. Continue subindo!",
+  out_of_stock: "Essa recompensa esgotou. Confira as outras!",
+} as const satisfies Record<RedeemError, string>;
+
+export const ValidateRedemptionInput = z.object({
+  code: z.string().regex(/^\d{6}$/, "O código tem 6 números"),
+});
+export type ValidateRedemptionInput = z.infer<typeof ValidateRedemptionInput>;
+
+export const VALIDATE_ERRORS = ["code_not_found", "code_expired", "code_already_used"] as const;
+export type ValidateError = (typeof VALIDATE_ERRORS)[number];
+
+export const VALIDATE_ERROR_MESSAGES = {
+  code_not_found: "Código não encontrado. Confira os 6 números com o cliente.",
+  code_expired: "Esse código expirou. Peça ao cliente para resgatar de novo.",
+  code_already_used: "Esse código já foi usado.",
+} as const satisfies Record<ValidateError, string>;
+
+export type ValidateSuccess = {
+  rewardTitle: string;
+  benefit: string;
+  visitorName: string;
+  visitorTier: Tier;
+  redeemedAt: Date;
+};
 
 /**
  * Fábrica de Server Actions com validação na borda.

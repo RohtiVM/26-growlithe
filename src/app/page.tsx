@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { AB_COOKIE, HEADLINES, parseVariant } from "@/landing/ab-test";
-import { TIERS, TIER_THRESHOLDS, type Tier } from "@/domain/schemas";
+import { WaitlistForm } from "@/landing/WaitlistForm";
+import { LeadProfile, TIERS, TIER_THRESHOLDS, type Tier, type Utm } from "@/domain/schemas";
+import { getDb } from "@/server/db";
 
 const TIER_LABELS = {
   bronze: "🥉 Bronze",
@@ -24,9 +27,33 @@ const FAQ = [
   { q: "Quanto custa?", a: "Para o visitante, nada. É só passear, escanear e ganhar." },
 ] as const;
 
-export default async function LandingPage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+const param = (params: SearchParams, key: string): string | null => {
+  const value = params[key];
+  return typeof value === "string" && value.trim() !== "" ? value.trim().slice(0, 60) : null;
+};
+
+export default async function LandingPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const cookieStore = await cookies();
   const variant = parseVariant(cookieStore.get(AB_COOKIE)?.value) ?? "A";
+  const params = await searchParams;
+  const profile = LeadProfile.safeParse(params.perfil);
+  const utm: Utm = {
+    source: param(params, "utm_source"),
+    medium: param(params, "utm_medium"),
+    campaign: param(params, "utm_campaign"),
+  };
+  const waiting = getDb().leads.length;
+  /** Os CTAs mudam o perfil sem perder a UTM de onde a visita veio. */
+  const ctaHref = (perfil: LeadProfile): string => {
+    const query = new URLSearchParams({ perfil });
+    for (const key of ["utm_source", "utm_medium", "utm_campaign"]) {
+      const value = param(params, key);
+      if (value !== null) query.set(key, value);
+    }
+    return `?${query.toString()}#lista-de-espera`;
+  };
 
   return (
     <>
@@ -34,7 +61,10 @@ export default async function LandingPage() {
         <a className="brand" href="/">
           🔥 Growlithe
         </a>
-        <a href="#lojistas">Para lojistas</a>
+        <nav className="row" style={{ gap: 16 }}>
+          <a href="#lojistas">Para lojistas</a>
+          <Link href="/app">Abrir o app</Link>
+        </nav>
       </header>
 
       <main>
@@ -44,9 +74,19 @@ export default async function LandingPage() {
             Escaneie, complete missões e troque pontos por estacionamento, descontos e experiências. Sem
             instalar nada.
           </p>
-          <a className="btn" href="#lista-de-espera">
-            Entrar na lista de espera
-          </a>
+          <div className="actions">
+            <a className="btn" href={ctaHref("visitante")}>
+              Entrar na lista de espera
+            </a>
+            <Link className="btn btn-secondary" href="/app">
+              Experimentar agora
+            </Link>
+          </div>
+          {waiting > 0 && (
+            <p className="muted" style={{ marginTop: 16 }}>
+              ⭐ {waiting.toLocaleString("pt-BR")} {waiting === 1 ? "pessoa já está" : "pessoas já estão"} na fila
+            </p>
+          )}
         </section>
 
         <section className="section">
@@ -111,10 +151,10 @@ export default async function LandingPage() {
               </article>
             </div>
             <div className="actions">
-              <a className="btn" href="#lista-de-espera">
+              <a className="btn" href={ctaHref("lojista")}>
                 Quero minha loja no Growlithe
               </a>
-              <a className="btn btn-secondary" href="#lista-de-espera">
+              <a className="btn btn-secondary" href={ctaHref("shopping")}>
                 Agendar demonstração
               </a>
             </div>
@@ -138,9 +178,12 @@ export default async function LandingPage() {
         <section className="section" id="lista-de-espera">
           <div className="container">
             <h2>Lista de espera</h2>
-            <p className="lead">
-              O cadastro abre em breve. Visitantes, lojistas e shoppings vão poder entrar por aqui.
-            </p>
+            <p className="lead">Visitantes, lojistas e shoppings: deixe seu contato e seja dos primeiros.</p>
+            <WaitlistForm
+              key={profile.success ? profile.data : "visitante"}
+              defaultProfile={profile.success ? profile.data : "visitante"}
+              utm={utm}
+            />
           </div>
         </section>
       </main>
