@@ -34,7 +34,7 @@ export function MissionForm({
   const [kind, setKind] = useState<MissionKind>("purchase_category");
   const [flash, setFlash] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [done, setDone] = useState<string | null>(null);
+  const [done, setDone] = useState<{ title: string; notified: number | null } | null>(null);
   const [pending, startTransition] = useTransition();
 
   const err = (path: string) =>
@@ -104,7 +104,7 @@ export function MissionForm({
         startTransition(async () => {
           const result = await createMission(parsed.data);
           if (result.ok) {
-            setDone(parsed.data.title);
+            setDone({ title: parsed.data.title, notified: result.data.notified });
             form.reset();
             router.refresh();
           } else {
@@ -117,7 +117,9 @@ export function MissionForm({
         <div className="alert" role="status">
           <span aria-hidden="true">✅</span>
           <span>
-            Missão “{done}” criada.{flash ? " O card de Missão Relâmpago já aparece no início do app." : ""}
+            Missão “{done.title}” criada.
+            {done.notified !== null &&
+              ` Aviso enviado para ${done.notified} ${done.notified === 1 ? "aparelho" : "aparelhos"}.`}
           </span>
         </div>
       )}

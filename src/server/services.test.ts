@@ -6,7 +6,9 @@ import {
   createMission,
   expireRedemptions,
   joinWaitlist,
+  notifyFlashMission,
   redeemReward,
+  savePushSubscription,
   scanCheckpoint,
   scanReceipt,
   validateRedemption,
@@ -274,5 +276,52 @@ describe("lista de espera da landing page", () => {
       ok: false,
       error: "already_on_list",
     });
+  });
+});
+
+describe("push da Missão Relâmpago (spec 001, critério 2)", () => {
+  const sub = (n: number) => ({
+    endpoint: `https://push.example.com/${n}`,
+    keys: { p256dh: `chave-${n}`, auth: `auth-${n}` },
+  });
+  const flash = () => {
+    const m = db.missions.find((x) => x.id === FLASH);
+    if (m === undefined) throw new Error("seed sem missão relâmpago");
+    return m;
+  };
+
+  it("guarda uma inscrição por aparelho (endpoint)", () => {
+    savePushSubscription(db, MARINA, sub(1), NOW);
+    savePushSubscription(db, MARINA, { ...sub(1), keys: { p256dh: "nova", auth: "nova" } }, NOW);
+    expect(db.pushSubscriptions).toHaveLength(1);
+    expect(db.pushSubscriptions[0]?.p256dh).toBe("nova");
+  });
+
+  it("envia o texto do push a todos e apaga inscrições canceladas", async () => {
+    [1, 2, 3].forEach((n) => {
+      savePushSubscription(db, MARINA, sub(n), NOW);
+    });
+    const payloads: string[] = [];
+    const result = await notifyFlashMission(db, flash(), async (s, payload) => {
+      payloads.push(payload.title);
+      if (s.endpoint.endsWith("/2")) return "gone";
+      if (s.endpoint.endsWith("/3")) throw new Error("rede caiu");
+      return "sent";
+    });
+    expect(result).toEqual({ sent: 1, removed: 1, failed: 1 });
+    expect(payloads[0]).toBe("⚡ MISSÃO RELÂMPAGO!");
+    expect(db.pushSubscriptions.map((s) => s.endpoint)).toEqual([sub(1).endpoint, sub(3).endpoint]);
+  });
+
+  it("missão semanal não dispara push", async () => {
+    savePushSubscription(db, MARINA, sub(1), NOW);
+    const weekly = db.missions.find((m) => m.launch.type === "scheduled");
+    if (weekly === undefined) throw new Error("seed sem missão semanal");
+    let calls = 0;
+    await notifyFlashMission(db, weekly, async () => {
+      calls++;
+      return "sent";
+    });
+    expect(calls).toBe(0);
   });
 });

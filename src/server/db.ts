@@ -51,6 +51,14 @@ export type ReceiptRecord = {
   verifiedBy: "local" | "sefaz";
 };
 
+export type PushSubscriptionRecord = {
+  userId: UserId;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  createdAt: Date;
+};
+
 export type Db = {
   users: User[];
   stores: Store[];
@@ -63,6 +71,7 @@ export type Db = {
   rewards: Reward[];
   redemptions: Redemption[];
   leads: LandingLead[];
+  pushSubscriptions: PushSubscriptionRecord[];
 };
 
 /* ------------------------------------------------------------------ */
@@ -239,6 +248,7 @@ export const createSeedDb = (now: Date = new Date()): Db => {
     rewards,
     redemptions: [],
     leads: [],
+    pushSubscriptions: [],
   };
 };
 

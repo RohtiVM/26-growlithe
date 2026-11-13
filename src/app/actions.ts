@@ -12,6 +12,7 @@ import {
   CreateCheckpointInput,
   CreateMissionInput,
   JoinWaitlistInput,
+  PushSubscriptionInput,
   RedeemRewardInput,
   SCAN_ERROR_MESSAGES,
   ScanQrInput,
@@ -26,6 +27,7 @@ import {
 import { AB_COOKIE, parseVariant } from "@/landing/ab-test";
 import { getDb } from "@/server/db";
 import { serverEnv } from "@/server/env";
+import { createWebPushSender } from "@/server/push";
 import { DYNAMIC_QR_TTL_S, qrUrl, resolveManualCode, signQrToken, verifyQrToken } from "@/server/qr";
 import { createInfosimplesVerifier, localVerifier, withFallback } from "@/server/receipt-verifier";
 import * as services from "@/server/services";
@@ -130,6 +132,14 @@ export const redeemReward = defineAction(RedeemRewardInput, async ({ rewardId })
   return result;
 });
 
+/** Guarda a inscrição de push deste aparelho para os avisos de Missão Relâmpago. */
+export const savePushSubscription = defineAction(PushSubscriptionInput, async (sub) => {
+  const userId = await currentUserId();
+  if (userId === null) return notAuthenticated;
+  services.savePushSubscription(getDb(), userId, sub, new Date());
+  return { ok: true, data: null } as const;
+});
+
 /* ------------------------------------------------------------------ */
 /* Landing page                                                        */
 /* ------------------------------------------------------------------ */
@@ -165,10 +175,17 @@ export const adminLogout = async (): Promise<void> => {
 
 export const createMission = defineAction(CreateMissionInput, async (input) => {
   if (!(await isAdmin())) return forbidden;
-  const mission = services.createMission(getDb(), input, new Date());
+  const db = getDb();
+  const mission = services.createMission(db, input, new Date());
   revalidatePath("/admin", "layout");
   refreshVisitor();
-  return { ok: true, data: { id: mission.id } } as const;
+  // Critério 2 da spec 001: quem ativou os avisos recebe o push no lançamento.
+  const { vapid } = serverEnv();
+  const push =
+    mission.launch.type === "flash" && vapid !== null
+      ? await services.notifyFlashMission(db, mission, createWebPushSender(vapid))
+      : null;
+  return { ok: true, data: { id: mission.id, notified: push?.sent ?? null } } as const;
 });
 
 export const createCheckpoint = defineAction(CreateCheckpointInput, async (input) => {

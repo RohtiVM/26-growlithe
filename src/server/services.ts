@@ -39,6 +39,7 @@ import {
   type CreateCheckpointInput,
   type CreateMissionInput,
   type JoinWaitlistInput,
+  type PushSubscriptionInput,
   type MissionProgress,
   type ReceiptError,
   type ReceiptSuccess,
@@ -55,7 +56,7 @@ import {
 import { currentStreak, isMallOpen, localDay } from "@/domain/time";
 import type { Variant } from "@/landing/ab-test";
 import { sha256 } from "./crypto";
-import type { Db, LedgerReason } from "./db";
+import type { Db, LedgerReason, PushSubscriptionRecord } from "./db";
 import { checkReceiptForMission, type ReceiptVerifier } from "./receipt-verifier";
 
 export const MALL_HOURS = { open: 10, close: 22 } as const;
@@ -426,6 +427,69 @@ export const joinWaitlist = (
   });
   db.leads.push(lead);
   return { ok: true, data: { position: db.leads.length } };
+};
+
+/* ------------------------------------------------------------------ */
+/* Push: aviso da Missão Relâmpago (spec 001, critério 2)              */
+/* ------------------------------------------------------------------ */
+
+/** Guarda (ou atualiza) a inscrição deste aparelho. Um endpoint = um aparelho. */
+export const savePushSubscription = (
+  db: Db,
+  userId: UserId,
+  sub: PushSubscriptionInput,
+  now: Date,
+): void => {
+  const record: PushSubscriptionRecord = {
+    userId,
+    endpoint: sub.endpoint,
+    p256dh: sub.keys.p256dh,
+    auth: sub.keys.auth,
+    createdAt: now,
+  };
+  db.pushSubscriptions = [...db.pushSubscriptions.filter((s) => s.endpoint !== sub.endpoint), record];
+};
+
+export type PushPayload = { title: string; body: string; url: string; tag: string };
+
+export const flashPushPayload = (mission: Mission): PushPayload | null =>
+  mission.launch.type === "flash"
+    ? {
+        title: `⚡ ${mission.launch.pushTitle}`,
+        body: mission.launch.pushBody,
+        url: `/app/relampago/${mission.id}`,
+        tag: `flash-${mission.id}`,
+      }
+    : null;
+
+/** Resultado do envio a um aparelho. "gone" = inscrição cancelada (404/410): apagamos. */
+export type PushOutcome = "sent" | "gone" | "failed";
+export type PushSender = (sub: PushSubscriptionRecord, payload: PushPayload) => Promise<PushOutcome>;
+
+export const notifyFlashMission = async (
+  db: Db,
+  mission: Mission,
+  send: PushSender,
+): Promise<{ sent: number; removed: number; failed: number }> => {
+  const payload = flashPushPayload(mission);
+  if (payload === null) return { sent: 0, removed: 0, failed: 0 };
+  const subs = [...db.pushSubscriptions];
+  const outcomes = await Promise.all(
+    subs.map(async (sub) => {
+      try {
+        return { sub, outcome: await send(sub, payload) };
+      } catch {
+        return { sub, outcome: "failed" as const };
+      }
+    }),
+  );
+  const gone = new Set(outcomes.filter((o) => o.outcome === "gone").map((o) => o.sub.endpoint));
+  db.pushSubscriptions = db.pushSubscriptions.filter((s) => !gone.has(s.endpoint));
+  return {
+    sent: outcomes.filter((o) => o.outcome === "sent").length,
+    removed: gone.size,
+    failed: outcomes.filter((o) => o.outcome === "failed").length,
+  };
 };
 
 /* ------------------------------------------------------------------ */

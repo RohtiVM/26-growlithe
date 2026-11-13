@@ -15,6 +15,10 @@ const Env = z.object({
   NEXT_PUBLIC_APP_URL: z.url().optional(),
   /** "true" recusa scans fora do horário do shopping (10h–22h). */
   ENFORCE_MALL_HOURS: z.enum(["true", "false"]).default("false"),
+  /** Web Push (avisos da Missão Relâmpago). Sem as três, o push fica desligado. */
+  VAPID_PUBLIC_KEY: z.string().min(20).optional(),
+  VAPID_PRIVATE_KEY: z.string().min(20).optional(),
+  VAPID_SUBJECT: z.string().regex(/^(mailto:|https:\/\/)/, "VAPID_SUBJECT deve ser mailto: ou https://").optional(),
   INFOSIMPLES_TOKEN: z.string().min(1).optional(),
   INFOSIMPLES_NFCE_URL: z.url().optional(),
 });
@@ -25,6 +29,7 @@ export type ServerEnv = {
   appUrl: string;
   enforceMallHours: boolean;
   infosimples: { token: string; endpoint: string } | null;
+  vapid: { publicKey: string; privateKey: string; subject: string } | null;
 };
 
 const emptyToUndefined = (value: string | undefined): string | undefined =>
@@ -53,6 +58,10 @@ export const serverEnv = (): ServerEnv => {
     infosimples:
       raw.INFOSIMPLES_TOKEN !== undefined && raw.INFOSIMPLES_NFCE_URL !== undefined
         ? { token: raw.INFOSIMPLES_TOKEN, endpoint: raw.INFOSIMPLES_NFCE_URL }
+        : null,
+    vapid:
+      raw.VAPID_PUBLIC_KEY !== undefined && raw.VAPID_PRIVATE_KEY !== undefined && raw.VAPID_SUBJECT !== undefined
+        ? { publicKey: raw.VAPID_PUBLIC_KEY, privateKey: raw.VAPID_PRIVATE_KEY, subject: raw.VAPID_SUBJECT }
         : null,
   };
   return cached;

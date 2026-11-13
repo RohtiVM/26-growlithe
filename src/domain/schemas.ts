@@ -662,6 +662,20 @@ export const requirementLabel = (r: MissionRequirement): string => {
 };
 
 /* ------------------------------------------------------------------ */
+/* 8b. Notificações push (Missão Relâmpago)                            */
+/* ------------------------------------------------------------------ */
+
+/** Formato de `PushSubscription.toJSON()` do navegador — dado não confiável. */
+export const PushSubscriptionInput = z.object({
+  endpoint: z.url().max(1000).refine((u) => u.startsWith("https://"), "Endpoint precisa ser HTTPS"),
+  keys: z.object({
+    p256dh: z.string().min(1).max(200),
+    auth: z.string().min(1).max(100),
+  }),
+});
+export type PushSubscriptionInput = z.infer<typeof PushSubscriptionInput>;
+
+/* ------------------------------------------------------------------ */
 /* 9. Landing page — lista de espera                                   */
 /* ------------------------------------------------------------------ */
 

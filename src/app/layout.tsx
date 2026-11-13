@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   title: "Growlithe — missões que fazem você voltar ao shopping",
   description:
     "Escaneie QR Codes, complete missões e troque pontos por estacionamento, descontos e experiências. Sem instalar nada.",
+  appleWebApp: { capable: true, title: "Growlithe", statusBarStyle: "black-translucent" },
+  icons: { icon: "/pwa-icon/192", apple: "/pwa-icon/180" },
 };
 
 export const viewport: Viewport = {

@@ -3,10 +3,12 @@ import { isMissionActive } from "@/domain/game";
 import { TIERS, TIER_THRESHOLDS, requirementLabel, tierFromPoints, type Tier } from "@/domain/schemas";
 import { formatTime } from "@/domain/time";
 import { checkRedeem } from "@/domain/rewards";
+import { serverEnv } from "@/server/env";
 import { missionCards, visitorStreak } from "@/server/services";
 import { requireVisitor } from "@/server/visitor";
 import { Countdown } from "@/ui/components/Countdown";
 import { ProgressBar } from "@/ui/components/ProgressBar";
+import { PushOptIn } from "@/ui/components/PushOptIn";
 import { MISSION_ICONS, TIER_LABELS, TIER_NAMES, formatPoints, initials } from "@/ui/labels";
 
 const nextTier = (tier: Tier): Tier | null => TIERS[TIERS.indexOf(tier) + 1] ?? null;
@@ -25,6 +27,7 @@ export default async function HomePage() {
   );
   const affordable = db.rewards.filter((r) => checkRedeem(r, user) === null).slice(0, 2);
   const firstName = user.name.split(" ")[0] ?? user.name;
+  const { vapid } = serverEnv();
 
   return (
     <>
@@ -80,6 +83,8 @@ export default async function HomePage() {
           </>
         )}
       </section>
+
+      {vapid !== null && <PushOptIn vapidPublicKey={vapid.publicKey} />}
 
       <p style={{ margin: "12px 0 0", fontWeight: 600 }}>
         🔥 Sequência: {streak} {streak === 1 ? "dia" : "dias"}
