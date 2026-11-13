@@ -33,6 +33,7 @@ pnpm typecheck  # inclui os testes de tipo
 pnpm lint
 pnpm test
 pnpm build
+pnpm test:db    # migrations + RLS num Postgres temporário (precisa de Postgres 15+)
 ```
 
 O CI roda os quatro últimos em todo PR. PR só entra com CI verde.

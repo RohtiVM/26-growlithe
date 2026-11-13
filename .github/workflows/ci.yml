@@ -42,3 +42,12 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
           SUPABASE_SERVICE_ROLE_KEY: ci-placeholder
           QR_SIGNING_SECRET: ci-placeholder-ci-placeholder-ci-placeholder
+
+  database:
+    name: Banco (migrations, RLS e seed)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Migrations + seed + testes de RLS num Postgres temporário
+        run: bash supabase/tests/run.sh
