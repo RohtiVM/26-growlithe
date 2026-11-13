@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Tipos, lint, testes e build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (inclui testes de tipo)
+        run: pnpm typecheck
+
+      - name: Lint (sem any, sem as, switch exaustivo)
+        run: pnpm lint
+
+      - name: Testes
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+        env:
+          # Valores fictícios só para o build; os reais ficam na Vercel.
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder
+          QR_SIGNING_SECRET: ci-placeholder-ci-placeholder-ci-placeholder
