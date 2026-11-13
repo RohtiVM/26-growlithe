@@ -15,7 +15,7 @@ import { z } from "zod";
 /* ------------------------------------------------------------------ */
 
 const brandedId = <const TBrand extends string>(_brand: TBrand) =>
-  z.string().uuid().brand<TBrand>();
+  z.uuid().brand<TBrand>();
 
 export const UserId = brandedId("UserId");
 export type UserId = z.infer<typeof UserId>;
@@ -76,7 +76,7 @@ export type Presence = z.infer<typeof Presence>;
 export const User = z.object({
   id: UserId,
   name: z.string().min(2).max(80),
-  email: z.string().email(),
+  email: z.email(),
   phone: z
     .string()
     .regex(/^\+55\d{10,11}$/, "Telefone no formato +55DDDNUMERO")
@@ -587,9 +587,9 @@ export const Utm = z.object({
 export type Utm = z.infer<typeof Utm>;
 
 export const LandingLead = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   name: z.string().min(2, "Conta pra gente seu nome").max(80),
-  email: z.string().email("Confira o e-mail"),
+  email: z.email("Confira o e-mail"),
   profile: LeadProfile,
   /** Só preenchido quando o perfil é lojista ou shopping. */
   company: z.string().max(80).nullable(),

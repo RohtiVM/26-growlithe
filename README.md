@@ -12,7 +12,7 @@
 **Growlithe** é um **web app gamificado, feito em React**, que transforma a visita ao shopping em uma jornada de missões, pontos e prêmios. Ele abre direto no navegador do celular, **sem instalar nada**.
 
 ### Contexto
-Shopping centers deixaram de ser só lugares de compra: competem com o comércio online e com outras opções de lazer pela atenção e pelo tempo das pessoas. Para continuar relevante, o shopping precisa criar um **relacionamento contínuo com o visitante**, um motivo para ele voltar, circular por mais lojas e ficar mais tempo. Ao mesmo tempo, quase todo visitante já anda com um celular com câmera e internet, e o QR Code virou um hábito no Brasil (Pix, cardápios, cupons fiscais).
+O desafio é do **Shopping Capim Dourado** (Palmas, TO). Shopping centers deixaram de ser só lugares de compra: competem com o comércio online e com outras opções de lazer pela atenção e pelo tempo das pessoas. Para continuar relevante, o shopping precisa criar um **relacionamento contínuo com o visitante**, um motivo para ele voltar, circular por mais lojas e ficar mais tempo. Ao mesmo tempo, quase todo visitante já anda com um celular com câmera e internet, e o QR Code virou um hábito no Brasil (Pix, cardápios, cupons fiscais).
 
 ### Problemática
 - A visita é **transacional**: a pessoa entra, compra o que precisava e vai embora, sem motivo concreto para voltar.
@@ -183,6 +183,7 @@ Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), 
 growlithe/
 ├── README.md                     # esta documentação inicial
 ├── CONTEXT.md                    # glossário do domínio
+├── CLAUDE.md                     # regras do fluxo spec-driven para agentes
 ├── docs/
 │   ├── 01-telas-e-fluxos.md      # mapa de telas, fluxos, wireframes em texto
 │   ├── 02-visao-do-produto.md    # problema, personas, escopo do MVP, métricas
@@ -194,7 +195,8 @@ growlithe/
 │   ├── 08-qr-code-e-gamificacao.md
 │   ├── 09-integracao-sefaz.md
 │   ├── 10-processo-de-desenvolvimento.md
-│   ├── specs/001-missao-relampago.md
+│   ├── 11-plano-entrega-final.md # prazos de 14/11, critérios e ordem de entrega
+│   ├── specs/                    # 000-template · 001-missao-relampago · 002-landing-page
 │   └── wireframes/               # telas em PNG, tema escuro e claro
 ├── src/
 │   ├── domain/schemas.ts         # modelo de domínio (Zod), compila em strict
@@ -206,6 +208,8 @@ growlithe/
 ```
 
 ## Próximos passos (rumo ao MVP)
+
+> Prazo: **MVP rodando em 14/11 às 12h** e **pitch de 90s às 13h**. Ordem de entrega e critérios em [`docs/11-plano-entrega-final.md`](docs/11-plano-entrega-final.md). Toda feature passa pelo fluxo spec-driven ([`CLAUDE.md`](CLAUDE.md)).
 
 1. Criar o projeto React/Next.js e conectar o Supabase.
 2. Implementar check-in e missões por QR Code (assinatura HMAC + pontos no banco).
