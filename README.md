@@ -18,6 +18,17 @@
 | Resumo de uma página para os avaliadores | [`docs/Growlithe-resumo-avaliadores.pdf`](docs/Growlithe-resumo-avaliadores.pdf) · [versão em texto](docs/RESUMO-AVALIADORES.md) |
 | Vídeo de 90 segundos | entregue à parte pela equipe |
 
+### 📱 Experimente no celular
+
+<img src="docs/screenshots/qr-experimente.png" width="160" alt="QR Code de teste do check-in na Entrada principal" align="right">
+
+1. Aponte a câmera do celular para o QR ao lado (é o check-in da "Entrada principal", vale 20 pontos).
+2. Informe seu e-mail e toque no link que chegar — sem senha e sem instalar nada.
+3. Diga seu nome e veja os pontos, o nível e as missões em `/app`.
+
+Cada e-mail pontua uma vez por dia neste ponto (antifraude). Para ver a landing, o teste A/B e a lista de espera, basta abrir **https://growlithe-flax.vercel.app**.
+<br clear="right">
+
 ---
 
 ## 1. Nome do projeto e descrição (pitch)
