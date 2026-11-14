@@ -22,7 +22,7 @@ export default async function MissoesPage() {
   const done = missions.filter((m) => m.done);
 
   return (
-    <VisitorShell tab="missoes" points={visitor.points}>
+    <VisitorShell tab="missoes" points={visitor.points} staff={visitor.isStaff}>
       <div className="v-greeting reveal reveal-1">
         <h1>Missões</h1>
         <p className="lead">Complete missões pelo shopping e ganhe pontos extras.</p>

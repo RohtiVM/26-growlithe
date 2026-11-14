@@ -10,6 +10,8 @@ import { SleepingMascot } from "@/easter/sleeping-mascot";
 import { parseEasterOverride } from "@/easter/egg";
 import { getEasterEgg } from "@/easter/weather";
 import { ThemeToggle } from "@/ui/theme-toggle";
+import { EvaluatorButton } from "@/visitor/evaluator-button";
+import { isEvaluatorWindowOpen } from "@/painel/evaluator";
 
 const TIER_INFO = {
   bronze: { label: "Bronze", initial: "B", perk: "Café e descontos em lanchonetes" },
@@ -96,6 +98,11 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
               <a className="btn" href="#lista-de-espera">Entrar na lista de espera</a>
               <a className="btn btn-secondary" href="#como-funciona">Ver como funciona</a>
             </div>
+            {isEvaluatorWindowOpen(new Date()) && (
+              <div className="reveal reveal-4">
+                <EvaluatorButton next="/app" label="Avaliador? Teste agora, sem cadastro" inline />
+              </div>
+            )}
             <p className="hero-note reveal reveal-4">
               <Zap size={16} aria-hidden /> Shopping Capim Dourado · Palmas, TO
             </p>
