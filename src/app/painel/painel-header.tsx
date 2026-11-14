@@ -1,3 +1,4 @@
+import { Flame, LogOut, Store, ShieldCheck } from "lucide-react";
 import type { StaffMember } from "@/domain/schemas";
 import { signOut } from "./actions";
 
@@ -7,15 +8,22 @@ const ROLE_LABEL = { admin: "Admin do shopping", lojista: "Lojista" } as const s
 >;
 
 export function PainelHeader({ staff }: { staff: StaffMember }) {
+  const RoleIcon = staff.role === "admin" ? ShieldCheck : Store;
   return (
-    <header className="container nav">
-      <span className="brand">🔥 Painel</span>
-      <form action={signOut} className="nav-actions">
-        <span className="muted">{ROLE_LABEL[staff.role]}</span>
-        <button className="btn btn-secondary" type="submit">
-          Sair
-        </button>
-      </form>
+    <header className="site-header no-print">
+      <div className="container nav">
+        <a className="brand" href="/painel">
+          <Flame size={20} aria-hidden /> Painel
+        </a>
+        <form action={signOut} className="nav-actions">
+          <span className="role-chip">
+            <RoleIcon size={14} aria-hidden /> {ROLE_LABEL[staff.role]}
+          </span>
+          <button className="btn btn-secondary btn-sm" type="submit">
+            <LogOut size={16} aria-hidden /> Sair
+          </button>
+        </form>
+      </div>
     </header>
   );
 }

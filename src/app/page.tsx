@@ -1,22 +1,42 @@
 import { cookies } from "next/headers";
+import { Flame, Gift, Plus, ScanLine, Store, Target, Zap, BarChart3, Users } from "lucide-react";
 import { AB_COOKIE, HEADLINES, parseVariant } from "@/landing/ab-test";
+import { Countdown } from "@/landing/countdown";
 import { TIERS, TIER_THRESHOLDS, type Tier } from "@/domain/schemas";
 
-const TIER_LABELS = {
-  bronze: "🥉 Bronze",
-  prata: "🥈 Prata",
-  ouro: "🥇 Ouro",
-  diamante: "💎 Diamante",
-} as const satisfies Record<Tier, string>;
+const TIER_INFO = {
+  bronze: { label: "Bronze", initial: "B", perk: "Café e descontos em lanchonetes" },
+  prata: { label: "Prata", initial: "P", perk: "Estacionamento grátis" },
+  ouro: { label: "Ouro", initial: "O", perk: "Ingressos de cinema" },
+  diamante: { label: "Diamante", initial: "D", perk: "Pré-estreias e experiências VIP" },
+} as const satisfies Record<Tier, { label: string; initial: string; perk: string }>;
 
 const STEPS = [
-  { title: "📷 Escaneie", text: "Aponte a câmera do celular para um QR Code do Growlithe no shopping." },
-  { title: "🎯 Complete missões", text: "Check-in, caça ao tesouro, sequência de visitas e eventos." },
-  { title: "🎁 Ganhe prêmios", text: "Troque pontos por estacionamento grátis, descontos e experiências." },
+  {
+    icon: ScanLine,
+    title: "Escaneie",
+    text: "Aponte a câmera para o QR Code do Growlithe na entrada, nas lojas e nos eventos.",
+  },
+  {
+    icon: Target,
+    title: "Complete missões",
+    text: "Caça ao tesouro, visitas seguidas, eventos e desafios relâmpago com pontos em dobro.",
+  },
+  {
+    icon: Gift,
+    title: "Ganhe prêmios",
+    text: "Troque pontos por estacionamento grátis, descontos nas lojas e experiências.",
+  },
+] as const;
+
+const FEATURES = [
+  { icon: Users, title: "Mais gente na porta", text: "Missões levam visitantes até a sua loja, inclusive em alas pouco movimentadas." },
+  { icon: Store, title: "Zero integração", text: "As compras são validadas pelo QR Code que já vem em todo cupom fiscal." },
+  { icon: BarChart3, title: "Dados em tempo real", text: "Circulação por loja e horário, retorno dos visitantes e resultado de cada campanha." },
 ] as const;
 
 const FAQ = [
-  { q: "Preciso baixar um app?", a: "Não. O Growlithe abre direto no navegador do celular." },
+  { q: "Preciso baixar um aplicativo?", a: "Não. O Growlithe abre direto no navegador do celular, pela câmera." },
   {
     q: "Meus dados ficam seguros?",
     a: "Sim. Seguimos a LGPD: do cupom fiscal guardamos só loja, valor e horário, nunca o CPF.",
@@ -24,128 +44,160 @@ const FAQ = [
   { q: "Quanto custa?", a: "Para o visitante, nada. É só passear, escanear e ganhar." },
 ] as const;
 
+const fmt = (n: number): string => n.toLocaleString("pt-BR");
+
 export default async function LandingPage() {
   const cookieStore = await cookies();
   const variant = parseVariant(cookieStore.get(AB_COOKIE)?.value) ?? "A";
 
   return (
     <>
-      <header className="container nav">
-        <a className="brand" href="/">
-          🔥 Growlithe
-        </a>
-        <a href="#lojistas">Para lojistas</a>
+      <header className="site-header">
+        <nav className="container nav" aria-label="Principal">
+          <a className="brand" href="/">
+            <Flame size={20} aria-hidden /> Growlithe
+          </a>
+          <div className="nav-links">
+            <a className="nav-link" href="#como-funciona">Como funciona</a>
+            <a className="nav-link" href="#premios">Prêmios</a>
+            <a className="nav-link" href="#lojistas">Para lojistas</a>
+            <a className="btn btn-sm" href="#lista-de-espera">Entrar na lista</a>
+          </div>
+        </nav>
       </header>
 
       <main>
         <section className="container hero" data-variant={variant}>
-          <h1>{HEADLINES[variant]}</h1>
-          <p className="lead">
-            Escaneie, complete missões e troque pontos por estacionamento, descontos e experiências. Sem
-            instalar nada.
-          </p>
-          <a className="btn" href="#lista-de-espera">
-            Entrar na lista de espera
-          </a>
-        </section>
-
-        <section className="section">
-          <div className="container">
-            <h2>Como funciona</h2>
-            <div className="grid">
-              {STEPS.map((step) => (
-                <article className="card" key={step.title}>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
-                </article>
-              ))}
+          <div>
+            <h1 className="reveal reveal-1">{HEADLINES[variant]}</h1>
+            <p className="lead reveal reveal-2">
+              Escaneie QR Codes nas lojas, complete missões e troque pontos por estacionamento, descontos e
+              experiências. Sem baixar nada: abre direto pela câmera do celular.
+            </p>
+            <div className="actions reveal reveal-3">
+              <a className="btn" href="#lista-de-espera">Entrar na lista de espera</a>
+              <a className="btn btn-secondary" href="#como-funciona">Ver como funciona</a>
             </div>
+            <p className="hero-note reveal reveal-4">
+              <Zap size={16} aria-hidden /> Shopping Capim Dourado · Palmas, TO
+            </p>
+          </div>
+
+          <div className="phone reveal reveal-3" aria-hidden>
+            <p className="phone-greeting">Olá, Marina</p>
+            <div className="phone-card">
+              <div className="phone-row">
+                <span>Nível Prata</span>
+                <span className="phone-points tabular">1.240 pts</span>
+              </div>
+              <div className="progress"><span style={{ width: "62%" }} /></div>
+            </div>
+            <div className="phone-card phone-flash">
+              <div className="phone-row"><span>⚡ Missão Relâmpago · ×2</span></div>
+              <strong>Compre uma peça de roupa em qualquer loja</strong>
+            </div>
+            <div className="phone-card">
+              <strong>Caça ao tesouro da Ala B</strong>
+              <div className="progress" style={{ marginTop: 10 }}><span style={{ width: "40%" }} /></div>
+            </div>
+            <span className="phone-scan"><ScanLine size={24} /></span>
           </div>
         </section>
 
-        <section className="section">
-          <div className="container">
-            <div className="flash">
-              <h2 style={{ margin: 0 }}>⚡ Missão Relâmpago</h2>
+        <section className="section container" id="como-funciona">
+          <h2>Como funciona</h2>
+          <div className="grid">
+            {STEPS.map((step, i) => (
+              <article className="card" key={step.title}>
+                <span className="icon-tile"><step.icon size={22} aria-hidden /></span>
+                <span className="step-label">Passo {i + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="container" aria-labelledby="relampago">
+          <div className="flash">
+            <div>
+              <span className="eyebrow"><Zap size={14} aria-hidden /> Missão Relâmpago</span>
+              <h2 id="relampago">“Compre uma peça de roupa até as 18h: pontos em dobro.”</h2>
               <p>
-                <strong>“Compre uma peça de roupa até as 18h: pontos em dobro.”</strong>
+                Desafios surpresa, sem marca definida. Compre em qualquer loja do shopping, escaneie o QR Code do seu
+                cupom fiscal e pronto.
               </p>
-              <p>Escaneie o QR do seu cupom fiscal e pronto. Vale em qualquer loja do shopping.</p>
+            </div>
+            <div>
+              <span className="countdown-label">Termina em</span>
+              <Countdown untilHour={18} />
             </div>
           </div>
         </section>
 
-        <section className="section">
-          <div className="container">
-            <h2>Níveis e prêmios</h2>
-            <div className="grid">
-              {TIERS.map((tier) => (
-                <article className="card" key={tier}>
-                  <h3>{TIER_LABELS[tier]}</h3>
-                  <p>
-                    {TIER_THRESHOLDS[tier] === 0
-                      ? "Seu ponto de partida"
-                      : `A partir de ${TIER_THRESHOLDS[tier].toLocaleString("pt-BR")} pontos históricos`}
-                  </p>
-                </article>
-              ))}
-            </div>
+        <section className="section container" id="premios">
+          <h2>Quanto mais você vem, mais você ganha</h2>
+          <div className="grid">
+            {TIERS.map((tier) => (
+              <article className="card" key={tier}>
+                <span className={`tier-dot tier-${tier}`} aria-hidden>{TIER_INFO[tier].initial}</span>
+                <h3>{TIER_INFO[tier].label}</h3>
+                <span className="tier-min tabular">a partir de {fmt(TIER_THRESHOLDS[tier])} pts</span>
+                <p>{TIER_INFO[tier].perk}</p>
+              </article>
+            ))}
           </div>
         </section>
 
-        <section className="section" id="lojistas">
-          <div className="container">
-            <h2>Para lojistas e shoppings</h2>
-            <div className="grid" style={{ marginBottom: 24 }}>
-              <article className="card">
-                <h3>Mais gente na porta</h3>
-                <p>Missões levam visitantes até as alas menos movimentadas.</p>
-              </article>
-              <article className="card">
-                <h3>Sem integração</h3>
-                <p>A compra é validada pelo QR do cupom fiscal que sua loja já emite.</p>
-              </article>
-              <article className="card">
-                <h3>Dados em tempo real</h3>
-                <p>Saiba quem visita, quando volta e quais ações funcionam.</p>
-              </article>
-            </div>
-            <div className="actions">
-              <a className="btn" href="#lista-de-espera">
-                Quero minha loja no Growlithe
-              </a>
-              <a className="btn btn-secondary" href="#lista-de-espera">
-                Agendar demonstração
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="container">
-            <h2>Perguntas frequentes</h2>
-            <dl className="faq">
-              {FAQ.map((item) => (
-                <div key={item.q}>
-                  <dt>{item.q}</dt>
-                  <dd>{item.a}</dd>
+        <section className="container" id="lojistas">
+          <div className="panel-block">
+            <span className="eyebrow">Para lojistas e shoppings</span>
+            <h2>Leve mais gente para a sua loja, sem instalar nada.</h2>
+            <div className="feature-list">
+              {FEATURES.map((f) => (
+                <div key={f.title}>
+                  <span className="icon-tile"><f.icon size={22} aria-hidden /></span>
+                  <h3>{f.title}</h3>
+                  <p>{f.text}</p>
                 </div>
               ))}
-            </dl>
+            </div>
+            <div className="actions">
+              <a className="btn" href="#lista-de-espera">Quero minha loja no Growlithe</a>
+              <a className="btn btn-secondary" href="#lista-de-espera">Agendar demonstração</a>
+            </div>
           </div>
         </section>
 
-        <section className="section" id="lista-de-espera">
-          <div className="container">
-            <h2>Lista de espera</h2>
-            <p className="lead">
+        <section className="section container">
+          <h2 className="centered">Perguntas frequentes</h2>
+          <div className="faq">
+            {FAQ.map((item) => (
+              <details key={item.q}>
+                <summary>
+                  {item.q}
+                  <Plus size={18} aria-hidden />
+                </summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="container" id="lista-de-espera">
+          <div className="panel-block waitlist">
+            <h2>Entre na lista de espera</h2>
+            <p className="lead" style={{ marginInline: "auto" }}>
               O cadastro abre em breve. Visitantes, lojistas e shoppings vão poder entrar por aqui.
             </p>
           </div>
         </section>
       </main>
 
-      <footer className="container footer">Growlithe · Time 26 · Missões que fazem você voltar ao shopping.</footer>
+      <footer className="container footer">
+        <span>Growlithe · Time 26 · Desafio 05: Engajamento e fidelização dos visitantes</span>
+        <span>Missões que fazem você voltar ao shopping.</span>
+      </footer>
     </>
   );
 }
