@@ -94,3 +94,22 @@ export const loadVisitorHome = async (userId: string) => {
     missions: list,
   };
 };
+
+const RainStoreRow = z.object({ name: z.string(), category: z.enum(["vestuario", "alimentacao"]) });
+
+/** Spec 006: lojas que combinam com dia de chuva (capas/guarda-chuvas e bebidas quentes). */
+export const loadRainStores = async (): Promise<Array<{ name: string; kind: "guarda-chuva" | "bebida" }>> => {
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("stores")
+    .select("name, category")
+    .eq("active", true)
+    .in("category", ["vestuario", "alimentacao"])
+    .order("name")
+    .limit(6);
+  return z
+    .array(RainStoreRow)
+    .catch([])
+    .parse(data)
+    .map((s) => ({ name: s.name, kind: s.category === "vestuario" ? "guarda-chuva" : "bebida" }));
+};

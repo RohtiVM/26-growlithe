@@ -5,6 +5,9 @@ import { Countdown } from "@/landing/countdown";
 import { readUtm } from "@/landing/waitlist";
 import { WaitlistForm } from "@/landing/waitlist-form";
 import { TIERS, TIER_THRESHOLDS, type Tier } from "@/domain/schemas";
+import { RainCard, RainLayer } from "@/easter/rain";
+import { SleepingMascot } from "@/easter/sleeping-mascot";
+import { getEasterEgg } from "@/easter/weather";
 
 const TIER_INFO = {
   bronze: { label: "Bronze", initial: "B", perk: "Café e descontos em lanchonetes" },
@@ -53,6 +56,8 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 export default async function LandingPage({ searchParams }: { searchParams: SearchParams }) {
   const cookieStore = await cookies();
   const params = await searchParams;
+  // Easter egg de sexta-feira 13 (spec 006): madrugada ou chuva forte em Palmas.
+  const egg = await getEasterEgg(params.easter);
   // D6: UTM do cartaz/QR lida aqui no servidor; a Server Action revalida.
   const utm = readUtm({ source: params.utm_source, medium: params.utm_medium, campaign: params.utm_campaign });
   const variant = parseVariant(cookieStore.get(AB_COOKIE)?.value) ?? "A";
@@ -73,6 +78,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
         </nav>
       </header>
 
+      {egg === "noite" && <SleepingMascot />}
+      {egg === "chuva" && <RainLayer />}
       <main>
         <section className="container hero" data-variant={variant}>
           <div>
@@ -110,6 +117,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
             <span className="phone-scan"><ScanLine size={24} /></span>
           </div>
         </section>
+
+        {egg === "chuva" && (
+          <div className="container egg-rain-slot">
+            <RainCard stores={[]} />
+          </div>
+        )}
 
         <section className="section container" id="como-funciona">
           <h2>Como funciona</h2>

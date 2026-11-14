@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ArrowRight, Camera, MapPin, Target, Zap } from "lucide-react";
+import { RainCard, RainLayer } from "@/easter/rain";
+import { SleepingMascot } from "@/easter/sleeping-mascot";
+import { getEasterEgg } from "@/easter/weather";
 import { firstName, getVisitor } from "@/server/visitor";
-import { loadVisitorHome } from "@/visitor/data";
+import { loadRainStores, loadVisitorHome } from "@/visitor/data";
 import { tierProgress, TIER_LABEL } from "@/visitor/scan";
 import { VisitorShell } from "@/visitor/visitor-shell";
 
@@ -16,18 +19,24 @@ const dateInPalmas = (d: Date): string =>
   d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", timeZone: "America/Araguaina" });
 
 /** Home do visitante (wireframe 01): nível, saldo, presença e missões em destaque. */
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ easter?: string | string[] }> }) {
   const visitor = await getVisitor();
   if (visitor.kind === "anonymous") redirect("/app/entrar?next=/app");
   if (visitor.name === "") redirect("/app/nome?next=/app");
 
-  const { checkin, missions } = await loadVisitorHome(visitor.id);
+  const [{ checkin, missions }, egg] = await Promise.all([
+    loadVisitorHome(visitor.id),
+    getEasterEgg((await searchParams).easter),
+  ]);
+  const rainStores = egg === "chuva" ? await loadRainStores() : [];
   const progress = tierProgress(visitor.lifetimePoints);
   const flash = missions.find((m) => m.flash && !m.done);
   const featured = missions.filter((m) => !m.flash).slice(0, 4);
 
   return (
     <VisitorShell tab="inicio" points={visitor.points}>
+      {egg === "noite" && <SleepingMascot />}
+      {egg === "chuva" && <RainLayer />}
       <div className="v-greeting reveal reveal-1">
         <p className="muted v-date">{dateInPalmas(new Date())}</p>
         <h1>Olá, {firstName(visitor.name)}</h1>
@@ -65,6 +74,8 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {egg === "chuva" && <RainCard stores={rainStores} />}
 
       {flash !== undefined && (
         <section className="flash v-flash reveal reveal-3">
