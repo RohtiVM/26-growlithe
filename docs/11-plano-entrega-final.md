@@ -35,10 +35,10 @@ Cada item passa pelo fluxo da `docs/10`: **grill → spec → tickets → TDD �
 |---|---|---|---|
 | 0 | — | Merge da base (`chore/base-nextjs`) + deploy na Vercel + Supabase conectado | Qualidade |
 | 1 | 002 · Landing page | Formulário da lista de espera gravando leads com variante e UTM | Pitch, roleta |
-| 2 | 003 · Check-in e missão por QR | Login por link mágico, scan de QR assinado, pontos creditados uma única vez, Home com saldo e nível | Problema, Qualidade, UX |
-| 3 | 004 · Resgate | Catálogo com 2–3 prêmios, cupom de resgate de 6 dígitos, tela do lojista para validar | Problema, UX |
+| 2 | 004 · Check-in e missão por QR | Login por link mágico, scan de QR assinado, pontos creditados uma única vez, Home com saldo e nível | Problema, Qualidade, UX |
+| 3 | 005 · Resgate | Catálogo com 2–3 prêmios e geração do cupom de resgate de 6 dígitos (a validação está na spec 003) | Problema, UX |
 | 4 | 001 · Missão Relâmpago | Validação local pela chave do cupom fiscal (sem SEFAZ) | Inovação |
-| 5 | — | Painel admin mínimo (criar missão, imprimir QR) | Viabilidade |
+| 5 | 003 · Painel (admin e lojista) | Checkpoints e QR (necessário para a demo do item 2), validar cupom de resgate, missões e dashboard | Viabilidade, Pitch |
 
 Se às 9h do dia 14 os itens 0–2 não estiverem prontos, **congelar o escopo** e polir o que existe. Um fluxo curto funcionando vale mais que cinco telas pela metade.
 

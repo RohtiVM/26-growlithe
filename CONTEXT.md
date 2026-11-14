@@ -21,6 +21,10 @@
 | **Recompensa** | Prêmio trocável por pontos | `Reward` |
 | **Resgate** | Troca de pontos por recompensa; gera código de 6 dígitos | `Redemption` |
 | **Cupom de resgate** | O código de 6 dígitos que o lojista valida. ⚠️ Não confundir com *cupom fiscal* | `Redemption.code` |
+| **Painel** | Área `/painel` usada pela equipe do shopping e das lojas | rota `/painel` |
+| **Papel** | O que a pessoa pode fazer no painel: `admin` ou `lojista`. Visitante não tem papel | `StaffRole` |
+| **Admin** | Equipe de marketing do shopping: missões, checkpoints, QR e dashboard | `StaffRole` `admin` |
+| **Lojista** | Gerente ou caixa de uma loja; só valida cupom de resgate da própria loja | `StaffRole` `lojista` |
 | **Lead** | Pessoa que se cadastrou na landing page | `LandingLead` |
 
 ## Termos proibidos (ambíguos)
