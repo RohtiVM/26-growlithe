@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
+import { ArrowLeft, Flame } from "lucide-react";
 import { CheckpointId, CheckpointRow } from "@/domain/schemas";
 import { requireStaffRole } from "@/painel/access";
 import { checkpointScanUrl, printedQrExpiry } from "@/painel/checkpoints";
@@ -42,11 +43,14 @@ export default async function CheckpointQrPage({ params }: { params: Promise<{ i
   const validUntil = new Date(exp * 1000).toLocaleDateString("pt-BR");
 
   return (
-    <main className="container narrow qr-sheet">
-      <p className="no-print">
-        <a href="/painel/checkpoints">← Checkpoints</a>
+    <main className="container narrow qr-sheet painel-main">
+      <a className="back-link no-print" href="/painel/checkpoints">
+        <ArrowLeft size={16} aria-hidden /> Checkpoints
+      </a>
+      <p className="brand" style={{ justifyContent: "center", width: "100%" }}>
+        <Flame size={22} aria-hidden /> Growlithe
       </p>
-      <h1>🔥 Escaneie e ganhe pontos</h1>
+      <h1>Escaneie e ganhe pontos</h1>
       <p className="lead">{checkpoint.data.label}</p>
       <div className="qr-code" role="img" aria-label={`QR Code do checkpoint ${checkpoint.data.label}`} dangerouslySetInnerHTML={{ __html: svg }} />
       <p>Aponte a câmera do celular. Não precisa instalar nada.</p>

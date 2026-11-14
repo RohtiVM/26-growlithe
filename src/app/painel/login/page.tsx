@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Flame } from "lucide-react";
 import { painelHomePath } from "@/painel/access";
 import { getPainelAccess } from "@/server/staff";
 import { LoginForm } from "./login-form";
@@ -12,10 +13,15 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { erro } = await searchParams;
 
   return (
-    <main className="container narrow">
-      <h1>Painel do shopping</h1>
-      <p className="lead">Entre com o e-mail cadastrado pelo marketing do shopping. Sem senha: enviamos um link.</p>
-      <LoginForm linkError={erro === "link"} />
+    <main className="auth-shell">
+      <div className="auth-card card reveal reveal-1">
+        <a className="brand" href="/">
+          <Flame size={20} aria-hidden /> Growlithe
+        </a>
+        <h1>Painel do shopping</h1>
+        <p className="lead">Entre com o e-mail cadastrado pelo marketing do shopping. Sem senha: enviamos um link.</p>
+        <LoginForm linkError={erro === "link"} />
+      </div>
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { ArrowLeft, TicketCheck } from "lucide-react";
 import { requireStaffRole } from "@/painel/access";
 import { getPainelAccess } from "@/server/staff";
 import { NoAccess } from "../no-access";
@@ -16,9 +17,21 @@ export default async function ValidarPage() {
   return (
     <>
       <PainelHeader staff={allowed.data} />
-      <main className="container narrow">
-        <h1>Validar cupom de resgate</h1>
-        <p className="lead">A validação pelo código de 6 dígitos chega no ticket T8.</p>
+      <main className="container narrow painel-main">
+        {allowed.data.role === "admin" && (
+          <a className="back-link" href="/painel">
+            <ArrowLeft size={16} aria-hidden /> Painel
+          </a>
+        )}
+        <div className="painel-title reveal reveal-1">
+          <h1>Validar cupom de resgate</h1>
+          <p className="lead">Digite os 6 dígitos que o visitante mostrar no celular.</p>
+        </div>
+        <div className="empty reveal reveal-2">
+          <TicketCheck size={28} aria-hidden />
+          <strong>Validação chegando</strong>
+          <span>A conferência pelo código de 6 dígitos entra no ticket T8.</span>
+        </div>
       </main>
     </>
   );

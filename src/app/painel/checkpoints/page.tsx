@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { ArrowLeft, MapPin, Printer, QrCode, Store } from "lucide-react";
 import { z } from "zod";
 import { CheckpointRow } from "@/domain/schemas";
 import { requireStaffRole } from "@/painel/access";
@@ -34,41 +35,58 @@ export default async function CheckpointsPage() {
   return (
     <>
       <PainelHeader staff={allowed.data} />
-      <main className="container">
-        <p>
-          <a href="/painel">← Painel</a>
-        </p>
-        <h1>Checkpoints e QR Codes</h1>
-        <p className="lead">Cada checkpoint é um ponto físico com um QR Code assinado. Imprima e cole no local.</p>
+      <main className="container painel-main">
+        <a className="back-link" href="/painel">
+          <ArrowLeft size={16} aria-hidden /> Painel
+        </a>
+        <div className="painel-title reveal reveal-1">
+          <h1>Checkpoints e QR Codes</h1>
+          <p className="lead">Cada checkpoint é um ponto físico com um QR Code assinado. Imprima e cole no local.</p>
+        </div>
 
-        <div className="grid" style={{ alignItems: "start" }}>
-          <CheckpointForm stores={stores} />
+        <div className="split">
+          <div className="reveal reveal-2">
+            <CheckpointForm stores={stores} />
+          </div>
 
-          <section aria-labelledby="lista">
-            <h2 id="lista">Pontos cadastrados</h2>
+          <section aria-labelledby="lista" className="reveal reveal-3">
+            <div className="section-head" style={{ marginBottom: 16 }}>
+              <h2 id="lista" style={{ fontSize: "1.25rem" }}>Pontos cadastrados</h2>
+              <span className="muted tabular">{checkpoints.length}</span>
+            </div>
             {loadFailed && (
               <p className="alert" role="alert">
-                ⚠️ Não conseguimos carregar os checkpoints. Recarregue a página.
+                Não conseguimos carregar os checkpoints. Recarregue a página.
               </p>
             )}
             {!loadFailed && checkpoints.length === 0 && (
-              <p className="muted">Nenhum ponto ainda. Comece pela entrada principal do shopping.</p>
+              <div className="empty">
+                <QrCode size={28} aria-hidden />
+                <strong>Nenhum ponto ainda</strong>
+                <span>Comece pela entrada principal do shopping.</span>
+              </div>
             )}
             <ul className="list">
-              {checkpoints.map((cp) => (
-                <li key={cp.id} className="card list-item">
-                  <div>
-                    <strong>{cp.label}</strong>
-                    <p className="muted">
-                      {cp.storeId === null ? "Área do shopping" : (storeName.get(cp.storeId) ?? "Loja")}
-                      {cp.active ? "" : " · inativo"}
-                    </p>
-                  </div>
-                  <a className="btn btn-secondary" href={`/painel/checkpoints/${cp.id}/qr`}>
-                    Imprimir QR
-                  </a>
-                </li>
-              ))}
+              {checkpoints.map((cp) => {
+                const Icon = cp.storeId === null ? MapPin : Store;
+                return (
+                  <li key={cp.id} className="card list-item">
+                    <div className="list-item-main">
+                      <span className="icon-tile"><Icon size={20} aria-hidden /></span>
+                      <div>
+                        <strong>{cp.label}</strong>
+                        <p className="muted">
+                          {cp.storeId === null ? "Área do shopping" : (storeName.get(cp.storeId) ?? "Loja")}
+                          {cp.active ? "" : " · inativo"}
+                        </p>
+                      </div>
+                    </div>
+                    <a className="btn btn-secondary btn-sm" href={`/painel/checkpoints/${cp.id}/qr`}>
+                      <Printer size={16} aria-hidden /> Imprimir QR
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         </div>

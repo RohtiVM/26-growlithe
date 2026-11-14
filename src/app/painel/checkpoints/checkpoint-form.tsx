@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { createCheckpointAction, type CreateCheckpointState } from "./actions";
 
 const initial: CreateCheckpointState = { status: "idle" };
@@ -10,7 +11,7 @@ export function CheckpointForm({ stores }: { stores: ReadonlyArray<{ id: string;
 
   return (
     <form action={action} className="form card" noValidate>
-      <h2 style={{ margin: 0 }}>Novo checkpoint</h2>
+      <h2 style={{ margin: 0, fontSize: "1.25rem" }}>Novo checkpoint</h2>
 
       <label htmlFor="label">Nome do ponto</label>
       <input
@@ -35,16 +36,18 @@ export function CheckpointForm({ stores }: { stores: ReadonlyArray<{ id: string;
 
       {state.status === "error" && (
         <p id="checkpoint-erro" className="field-error" role="alert">
-          ⚠️ {state.message}
+          <AlertTriangle size={18} aria-hidden style={{ flex: "none", marginTop: 2 }} />
+          {state.message}
         </p>
       )}
       {state.status === "created" && (
         <p className="alert" role="status">
-          ✅ “{state.label}” criado. Abra o QR na lista abaixo para imprimir.
+          <CheckCircle2 size={18} aria-hidden style={{ flex: "none", marginTop: 2 }} />
+          “{state.label}” criado. Abra o QR na lista para imprimir.
         </p>
       )}
 
-      <button className="btn" type="submit" disabled={pending}>
+      <button className="btn btn-block" type="submit" disabled={pending}>
         {pending ? "Criando…" : "Criar checkpoint"}
       </button>
     </form>
