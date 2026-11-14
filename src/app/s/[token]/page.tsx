@@ -5,6 +5,8 @@ import { createSupabaseServerClient } from "@/server/supabase";
 import { firstName, getVisitor } from "@/server/visitor";
 import { scanOutcomeFromRow, TIER_LABEL } from "@/visitor/scan";
 import { VisitorLoginForm } from "@/visitor/visitor-login-form";
+import { EvaluatorButton } from "@/visitor/evaluator-button";
+import { isEvaluatorWindowOpen } from "@/painel/evaluator";
 import { VisitorShell } from "@/visitor/visitor-shell";
 
 export const metadata: Metadata = { title: "QR Code · Growlithe" };
@@ -40,7 +42,8 @@ export default async function ScanPage({ params }: { params: Promise<{ token: st
         <div className="auth-card card reveal reveal-1">
           <span className="icon-tile"><MapPin size={22} aria-hidden /></span>
           <h1>Você achou um ponto Growlithe!</h1>
-          <p className="lead">Entre com seu e-mail para receber os pontos deste QR Code. Leva 10 segundos.</p>
+          <p className="lead">Entre para receber os pontos deste QR Code. Leva 10 segundos.</p>
+          {isEvaluatorWindowOpen(new Date()) && <EvaluatorButton next={here} label="Entrar como avaliador e pegar os pontos" />}
           <VisitorLoginForm next={here} cta="Receber meus pontos" />
         </div>
       </main>

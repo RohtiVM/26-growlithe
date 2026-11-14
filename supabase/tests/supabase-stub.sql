@@ -18,3 +18,8 @@ alter default privileges in schema public grant all on functions to anon, authen
 -- Como no Supabase: pgcrypto no schema extensions (hmac, gen_random_bytes).
 create schema if not exists extensions;
 create extension if not exists pgcrypto with schema extensions;
+-- Como no Supabase: auth.jwt() devolve as claims do token (ex.: is_anonymous).
+create function auth.jwt() returns jsonb language sql stable as $$
+  select coalesce(nullif(current_setting('request.jwt.claims', true), '')::jsonb, '{}'::jsonb)
+$$;
+grant execute on function auth.jwt() to anon, authenticated, service_role;

@@ -4,6 +4,8 @@ import { AlertTriangle, Flame } from "lucide-react";
 import { safeNextPath } from "@/painel/access";
 import { getVisitor } from "@/server/visitor";
 import { VisitorLoginForm } from "@/visitor/visitor-login-form";
+import { EvaluatorButton } from "@/visitor/evaluator-button";
+import { isEvaluatorWindowOpen } from "@/painel/evaluator";
 
 export const metadata: Metadata = { title: "Entrar · Growlithe" };
 
@@ -27,6 +29,7 @@ export default async function EntrarPage({ searchParams }: { searchParams: Promi
             Esse link expirou ou já foi usado. Peça um novo abaixo.
           </p>
         )}
+        {isEvaluatorWindowOpen(new Date()) && <EvaluatorButton next={next} />}
         <VisitorLoginForm next={next} />
       </div>
     </main>
