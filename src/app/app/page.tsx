@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ArrowRight, Camera, MapPin, Target, Zap } from "lucide-react";
 import { RainCard, RainLayer } from "@/easter/rain";
 import { SleepingMascot } from "@/easter/sleeping-mascot";
+import { parseEasterOverride } from "@/easter/egg";
 import { getEasterEgg } from "@/easter/weather";
 import { firstName, getVisitor } from "@/server/visitor";
 import { loadRainStores, loadVisitorHome } from "@/visitor/data";
@@ -24,10 +25,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   if (visitor.kind === "anonymous") redirect("/app/entrar?next=/app");
   if (visitor.name === "") redirect("/app/nome?next=/app");
 
-  const [{ checkin, missions }, egg] = await Promise.all([
-    loadVisitorHome(visitor.id),
-    getEasterEgg((await searchParams).easter),
-  ]);
+  const { easter } = await searchParams;
+  const [{ checkin, missions }, egg] = await Promise.all([loadVisitorHome(visitor.id), getEasterEgg(easter)]);
+  const forcedNight = parseEasterOverride(easter) === "noite";
   const rainStores = egg === "chuva" ? await loadRainStores() : [];
   const progress = tierProgress(visitor.lifetimePoints);
   const flash = missions.find((m) => m.flash && !m.done);
@@ -35,7 +35,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <VisitorShell tab="inicio" points={visitor.points}>
-      {egg === "noite" && <SleepingMascot />}
+      {egg === "noite" && <SleepingMascot forced={forcedNight} />}
       {egg === "chuva" && <RainLayer />}
       <div className="v-greeting reveal reveal-1">
         <p className="muted v-date">{dateInPalmas(new Date())}</p>

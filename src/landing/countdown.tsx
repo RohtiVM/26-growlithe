@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-/** Segundos até a próxima ocorrência de `hour`:00 no horário local. */
+/** Palmas (America/Araguaina) é UTC−3 o ano todo, sem horário de verão. */
+const PALMAS_UTC_OFFSET_HOURS = -3;
+
+/** Segundos até a próxima ocorrência de `hour`:00 no horário de Palmas, em qualquer fuso do navegador. */
 const secondsUntil = (hour: number, now: Date): number => {
   const target = new Date(now);
-  target.setHours(hour, 0, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
+  target.setUTCHours(hour - PALMAS_UTC_OFFSET_HOURS, 0, 0, 0);
+  if (target <= now) target.setUTCDate(target.getUTCDate() + 1);
   return Math.floor((target.getTime() - now.getTime()) / 1000);
 };
 

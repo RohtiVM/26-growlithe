@@ -7,6 +7,7 @@ import { WaitlistForm } from "@/landing/waitlist-form";
 import { TIERS, TIER_THRESHOLDS, type Tier } from "@/domain/schemas";
 import { RainCard, RainLayer } from "@/easter/rain";
 import { SleepingMascot } from "@/easter/sleeping-mascot";
+import { parseEasterOverride } from "@/easter/egg";
 import { getEasterEgg } from "@/easter/weather";
 
 const TIER_INFO = {
@@ -58,6 +59,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
   const params = await searchParams;
   // Easter egg de sexta-feira 13 (spec 006): madrugada ou chuva forte em Palmas.
   const egg = await getEasterEgg(params.easter);
+  const forcedNight = parseEasterOverride(params.easter) === "noite";
   // D6: UTM do cartaz/QR lida aqui no servidor; a Server Action revalida.
   const utm = readUtm({ source: params.utm_source, medium: params.utm_medium, campaign: params.utm_campaign });
   const variant = parseVariant(cookieStore.get(AB_COOKIE)?.value) ?? "A";
@@ -78,7 +80,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
         </nav>
       </header>
 
-      {egg === "noite" && <SleepingMascot />}
+      {egg === "noite" && <SleepingMascot forced={forcedNight} />}
       {egg === "chuva" && <RainLayer />}
       <main>
         <section className="container hero" data-variant={variant}>
