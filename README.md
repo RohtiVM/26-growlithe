@@ -233,20 +233,24 @@ growlithe/
 
 ### Onde paramos (retomar daqui)
 
-Estado em 14/11, madrugada: tudo commitado na `main`, CI verde. **Nenhuma mudança local pendente.**
+Estado em **14/11, madrugada**: tudo na `main`, CI verde, banco Supabase com as 5 migrations aplicadas.
 
-1. ⏳ **Configurar o redirect do login:** no Supabase, *Authentication → URL Configuration → Redirect URLs*, adicionar `http://localhost:3000/**` (e o endereço da Vercel quando existir).
-2. ⏳ **Primeiro login e promoção a admin:** rodar `pnpm dev`, abrir `/painel`, pedir o link com o e-mail do time e abrir o e-mail (deve aparecer "Você não tem acesso ao painel"). Depois, no SQL Editor do Supabase: `select private.grant_staff('<e-mail>', 'admin', null);` e recarregar a página.
-3. ✅ Painel T5 (#7): `/painel/checkpoints` cadastra pontos e `/painel/checkpoints/<id>/qr` imprime o QR assinado (válido por 1 ano). Falta testar logado como admin (depende do item 2).
-4. Conectar o repositório à Vercel e cadastrar as variáveis do `.env.example`.
-5. Spec 004: check-in e missão por QR (scan, pontos e Home do visitante).
-6. Spec 002, T3–T5: formulário da lista de espera gravando leads.
-7. Painel T6–T9, resgate (spec 005) e Missão Relâmpago (spec 001), se houver tempo.
+**Pronto:**
+- Landing com teste A/B, **lista de espera gravando leads** (spec 002) e passada de design (Impeccable).
+- **App do visitante (spec 004):** `/s/<token>` (escaneou → pontos), `/app` (nível, saldo, presença, missões) e `/app/missoes`. O QR é assinado e conferido **dentro do banco** (o segredo nunca sai de lá).
+- **Painel (spec 003):** login por papel, checkpoints e QR, **missões** (criar, listar, encerrar) e **validar cupom de resgate**.
+- **Easter egg de sexta-feira 13 (spec 006):** mascote dormindo de 00h às 06h e chuva forte em Palmas. Na demo: `?easter=noite` e `?easter=chuva`.
 
-**Em outro computador:** `git clone`, `pnpm install` e criar o `.env.local` a partir do `.env.example`:
-- `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: a chave *publishable* em *Project Settings → API keys*.
-- `QR_SIGNING_SECRET`: 32+ caracteres aleatórios. **Já gerado** no `.env.local` do computador de 14/11; copie de lá para a Vercel e para outros computadores. Use o **mesmo** valor em todos os ambientes, senão os QR impressos deixam de valer.
-- `SUPABASE_SERVICE_ROLE_KEY`: chave *secret*, só servidor. Ainda não é usada pelo código.
+**Roteiro da manhã (antes do pitch):**
+1. **Supabase → Authentication → URL Configuration → Redirect URLs:** adicionar `http://localhost:3000/**` (e o endereço da Vercel).
+2. `pnpm.cmd dev` → abrir `/painel` → pedir o link com o e-mail do admin → clicar no e-mail. Depois, no SQL Editor: `select private.grant_staff('<e-mail>', 'admin', null);` e recarregar.
+3. No painel: **Checkpoints → Imprimir QR** da "Entrada principal" (é o check-in, vale 20 pts). Crie uma missão de teste em **Missões**.
+4. No celular: escanear o QR → entrar com outro e-mail → informar o nome → ver os pontos. Abrir `/app`.
+5. Conectar o repositório à **Vercel** e cadastrar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (o `QR_SIGNING_SECRET` não é mais usado: o segredo vive no banco).
+6. Gravar o pitch de 90s até 12h30 (roteiro em `docs/11-plano-entrega-final.md`).
 
-PRs #12, #13 e #14 estão abertos no GitHub, mas o conteúdo já está na `main`: podem ser fechados.
+**Decisões tomadas de madrugada, para revisar (⚠️ nas specs):** spec 004 D9–D15 (pontos base 10/20, caça ao tesouro fora de ordem, missão completa 1 vez, multiplicador relâmpago, nome no primeiro login, endereços, celebração de nível) e spec 006 D3–D7 (mascote original, Open-Meteo, limiar de chuva, card no lugar do mapa, `?easter=`).
+
+**Pendente:** lista de e-mails de admin automática (falta saber os e-mails do time) e dashboard do painel (T9).
+
+**Em outro computador:** `git clone`, `pnpm install` e criar o `.env.local` com `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (chave *publishable* em *Project Settings → API keys*).
