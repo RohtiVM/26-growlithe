@@ -11,3 +11,7 @@ $$;
 grant usage on schema auth to anon, authenticated, service_role;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 grant usage on schema public to anon, authenticated, service_role;
+-- Como no Supabase: toda tabela nova em public nasce com ALL para estes papéis.
+-- Sem isto, os testes passariam mesmo com a migration esquecendo de revogar.
+alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to anon, authenticated, service_role;

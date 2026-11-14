@@ -161,7 +161,10 @@ alter table public.checkpoints enable row level security;
 alter table public.rewards enable row level security;
 alter table public.redemptions enable row level security;
 
-revoke all on public.stores, public.profiles, public.checkpoints, public.rewards, public.redemptions from anon;
+-- O Supabase concede ALL a anon e authenticated em tabelas novas do schema
+-- public. Tiramos tudo e devolvemos só o mínimo, coluna a coluna quando preciso.
+revoke all on public.stores, public.profiles, public.checkpoints, public.rewards, public.redemptions
+  from anon, authenticated;
 
 grant select on public.stores, public.checkpoints, public.rewards to authenticated;
 grant select on public.profiles, public.redemptions to authenticated;
