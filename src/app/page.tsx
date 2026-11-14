@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { Flame, Gift, Plus, ScanLine, Store, Target, Zap, BarChart3, Users } from "lucide-react";
+import { Flame, Gift, Plus, ScanLine, Sparkles, Store, Target, Zap, BarChart3, Users } from "lucide-react";
 import { AB_COOKIE, HEADLINES, parseVariant } from "@/landing/ab-test";
 import { Countdown } from "@/landing/countdown";
 import { readUtm } from "@/landing/waitlist";
@@ -97,7 +97,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
             </p>
           </div>
 
-          <div className="phone reveal reveal-3" aria-hidden>
+          <div className="hero-visual reveal reveal-3" aria-hidden>
+            <div className="hero-glow" />
+            <div className="phone">
             <p className="phone-greeting">Olá, Marina</p>
             <div className="phone-card">
               <div className="phone-row">
@@ -107,7 +109,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
               <div className="progress"><span style={{ width: "62%" }} /></div>
             </div>
             <div className="phone-card phone-flash">
-              <div className="phone-row"><span>⚡ Missão Relâmpago · ×2</span></div>
+              <div className="phone-row"><span><Zap size={12} /> Missão Relâmpago · ×2</span></div>
               <strong>Compre uma peça de roupa em qualquer loja</strong>
             </div>
             <div className="phone-card">
@@ -115,6 +117,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
               <div className="progress" style={{ marginTop: 10 }}><span style={{ width: "40%" }} /></div>
             </div>
             <span className="phone-scan"><ScanLine size={24} /></span>
+            </div>
+            <span className="hero-chip"><Sparkles size={16} /> +20 pts · check-in</span>
           </div>
         </section>
 
@@ -125,30 +129,34 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
         )}
 
         <section className="section container" id="como-funciona">
-          <h2>Como funciona</h2>
-          <div className="grid">
-            {STEPS.map((step, i) => (
-              <article className="card" key={step.title}>
-                <span className="icon-tile"><step.icon size={22} aria-hidden /></span>
-                <span className="step-label">Passo {i + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </article>
-            ))}
+          <div className="section-intro">
+            <h2>Como funciona</h2>
+            <p className="lead">Três gestos, nada para instalar.</p>
           </div>
+          <ol className="steps">
+            {STEPS.map((step, i) => (
+              <li className="step" key={step.title}>
+                <span className="step-num tabular" aria-hidden>{i + 1}</span>
+                <div>
+                  <h3><step.icon size={20} aria-hidden /> {step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="container" aria-labelledby="relampago">
           <div className="flash">
             <div>
-              <span className="eyebrow"><Zap size={14} aria-hidden /> Missão Relâmpago</span>
-              <h2 id="relampago">“Compre uma peça de roupa até as 18h: pontos em dobro.”</h2>
+              <h2 id="relampago" className="flash-title"><Zap size={26} aria-hidden /> Missão Relâmpago</h2>
+              <p className="flash-quote">“Compre uma peça de roupa até as 18h: pontos em dobro.”</p>
               <p>
                 Desafios surpresa, sem marca definida. Compre em qualquer loja do shopping, escaneie o QR Code do seu
                 cupom fiscal e pronto.
               </p>
             </div>
-            <div>
+            <div className="flash-timer">
               <span className="countdown-label">Termina em</span>
               <Countdown untilHour={18} />
             </div>
@@ -156,36 +164,47 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
         </section>
 
         <section className="section container" id="premios">
-          <h2>Quanto mais você vem, mais você ganha</h2>
-          <div className="grid">
-            {TIERS.map((tier) => (
-              <article className="card" key={tier}>
-                <span className={`tier-dot tier-${tier}`} aria-hidden>{TIER_INFO[tier].initial}</span>
-                <h3>{TIER_INFO[tier].label}</h3>
-                <span className="tier-min tabular">a partir de {fmt(TIER_THRESHOLDS[tier])} pts</span>
-                <p>{TIER_INFO[tier].perk}</p>
-              </article>
-            ))}
+          <div className="section-intro">
+            <h2>Quanto mais você vem, mais você ganha</h2>
+            <p className="lead">Seus pontos históricos nunca diminuem: cada visita te aproxima do próximo nível.</p>
           </div>
+          <ol className="ladder">
+            {TIERS.map((tier, i) => (
+              <li className="rung" key={tier}>
+                <span className={`tier-dot tier-${tier}`} aria-hidden>{TIER_INFO[tier].initial}</span>
+                <strong>{TIER_INFO[tier].label}</strong>
+                <span className="tier-min tabular">
+                  {i === 0 ? "desde o primeiro scan" : `a partir de ${fmt(TIER_THRESHOLDS[tier])} pts`}
+                </span>
+                <p>{TIER_INFO[tier].perk}</p>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="container" id="lojistas">
-          <div className="panel-block">
-            <span className="eyebrow">Para lojistas e shoppings</span>
-            <h2>Leve mais gente para a sua loja, sem instalar nada.</h2>
-            <div className="feature-list">
+          <div className="panel-block merchant">
+            <div className="merchant-pitch">
+              <h2>Leve mais gente para a sua loja, sem instalar nada.</h2>
+              <p className="lead">
+                Para lojistas e shoppings: o Growlithe transforma passeio em visita, visita em venda e cada scan em dado.
+              </p>
+              <div className="actions">
+                <a className="btn" href="#lista-de-espera">Quero minha loja no Growlithe</a>
+                <a className="btn btn-secondary" href="#lista-de-espera">Agendar demonstração</a>
+              </div>
+            </div>
+            <ul className="merchant-points">
               {FEATURES.map((f) => (
-                <div key={f.title}>
-                  <span className="icon-tile"><f.icon size={22} aria-hidden /></span>
-                  <h3>{f.title}</h3>
-                  <p>{f.text}</p>
-                </div>
+                <li key={f.title}>
+                  <f.icon size={22} aria-hidden />
+                  <div>
+                    <h3>{f.title}</h3>
+                    <p>{f.text}</p>
+                  </div>
+                </li>
               ))}
-            </div>
-            <div className="actions">
-              <a className="btn" href="#lista-de-espera">Quero minha loja no Growlithe</a>
-              <a className="btn btn-secondary" href="#lista-de-espera">Agendar demonstração</a>
-            </div>
+            </ul>
           </div>
         </section>
 

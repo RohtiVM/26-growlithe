@@ -29,9 +29,8 @@ export default async function PainelPage() {
       <PainelHeader staff={access.staff} />
       <main className="container painel-main">
         <div className="painel-title reveal reveal-1">
-          <span className="eyebrow">Shopping Capim Dourado</span>
           <h1>Painel do shopping</h1>
-          <p className="lead">O que você quer fazer agora?</p>
+          <p className="lead">Shopping Capim Dourado · o que você quer fazer agora?</p>
         </div>
         <div className="grid reveal reveal-2">
           {TILES.map((t) =>
