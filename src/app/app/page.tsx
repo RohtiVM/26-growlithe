@@ -79,10 +79,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
       {flash !== undefined && (
         <section className="flash v-flash reveal reveal-3">
-          <span className="eyebrow"><Zap size={14} aria-hidden /> Missão Relâmpago</span>
-          <h2>{flash.title}</h2>
+          <h2 className="flash-title"><Zap size={20} aria-hidden /> {flash.title}</h2>
           <p>
-            {flash.label} · +{flash.points} pts · até {timeInPalmas(flash.endsAt)}
+            Missão Relâmpago · {flash.label} · +{flash.points} pts · até {timeInPalmas(flash.endsAt)}
           </p>
         </section>
       )}

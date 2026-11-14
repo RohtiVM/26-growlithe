@@ -79,8 +79,8 @@ export default async function ScanPage({ params }: { params: Promise<{ token: st
         ) : (
           <span className="icon-tile icon-tile-success"><CheckCircle2 size={26} aria-hidden /></span>
         )}
-        <p className="eyebrow">{outcome.isCheckin ? "Check-in feito" : "Ponto encontrado"} · {outcome.checkpoint}</p>
         <p className="scan-points tabular">+{outcome.pointsEarned} pts</p>
+        <p className="scan-where">{outcome.isCheckin ? "Check-in feito" : "Ponto encontrado"} · {outcome.checkpoint}</p>
         <p className="lead">
           Boa, {firstName(visitor.name)}! Seu saldo agora é <strong className="tabular">{outcome.balance.toLocaleString("pt-BR")} pts</strong>.
         </p>
