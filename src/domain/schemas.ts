@@ -798,6 +798,143 @@ export const CHECKPOINT_ERROR_MESSAGES = {
 } as const satisfies Record<CheckpointError, string>;
 
 /* ------------------------------------------------------------------ */
+/* 12. Validar cupom de resgate (spec 003, T7/T8)                      */
+/* ------------------------------------------------------------------ */
+
+/** Os 6 dígitos que o visitante mostra no balcão. */
+export const RedemptionCode = z
+  .string()
+  .trim()
+  .regex(/^[0-9]{6}$/, "Digite os 6 dígitos do cupom de resgate.");
+export type RedemptionCode = z.infer<typeof RedemptionCode>;
+
+/** Erros da conferência: os da regra de validação + código que não existe (ou não é visível). */
+export const REDEMPTION_LOOKUP_ERRORS = ["not_found", ...REDEMPTION_VALIDATION_ERRORS] as const;
+export const RedemptionLookupError = z.enum(REDEMPTION_LOOKUP_ERRORS);
+export type RedemptionLookupError = z.infer<typeof RedemptionLookupError>;
+
+export const REDEMPTION_LOOKUP_MESSAGES = {
+  not_found: "Não encontramos este cupom de resgate. Confira os 6 dígitos com o visitante e tente de novo.",
+  ...REDEMPTION_VALIDATION_MESSAGES,
+} as const satisfies Record<RedemptionLookupError, string>;
+
+/** Fuso do Shopping Capim Dourado (Palmas-TO): o servidor roda em UTC. */
+const MALL_TIME_ZONE = "America/Araguaina";
+
+/** "14/11/2026 às 10:32" no horário do shopping. */
+export const formatMallDateTime = (date: Date): string => {
+  const day = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: MALL_TIME_ZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
+  const time = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: MALL_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(date);
+  return `${day} às ${time}`;
+};
+
+/** Critério 16: "já foi usado" vem com data e hora quando o banco informa. */
+export const redemptionLookupMessage = (error: RedemptionLookupError, redeemedAt: Date | null): string => {
+  switch (error) {
+    case "already_used":
+      return redeemedAt === null
+        ? REDEMPTION_LOOKUP_MESSAGES.already_used
+        : `Este cupom de resgate já foi usado em ${formatMallDateTime(redeemedAt)}. Peça ao visitante para conferir no app.`;
+    case "not_found":
+    case "expired":
+    case "other_store":
+    case "admin_only":
+      return REDEMPTION_LOOKUP_MESSAGES[error];
+    default:
+      return assertNever(error);
+  }
+};
+
+/** O que a tela mostra antes de confirmar (RF15, RNF05): só primeiro nome e nível. */
+export const RedemptionPreview = z.object({
+  rewardTitle: z.string(),
+  benefitText: z.string(),
+  firstName: z.string(),
+  tier: Tier,
+  expiresAt: z.date(),
+});
+export type RedemptionPreview = z.infer<typeof RedemptionPreview>;
+
+export const RedemptionRefusal = z.object({
+  kind: z.literal("refused"),
+  error: RedemptionLookupError,
+  redeemedAt: z.date().nullable(),
+});
+export type RedemptionRefusal = z.infer<typeof RedemptionRefusal>;
+
+export const RedemptionPreviewOutcome = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("found"), preview: RedemptionPreview }),
+  RedemptionRefusal,
+]);
+export type RedemptionPreviewOutcome = z.infer<typeof RedemptionPreviewOutcome>;
+
+export const RedemptionValidateOutcome = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("validated"), redeemedAt: z.date() }),
+  RedemptionRefusal,
+]);
+export type RedemptionValidateOutcome = z.infer<typeof RedemptionValidateOutcome>;
+
+/** Respostas de erro comuns a `preview_redemption` e `validate_redemption`. */
+const RedemptionRefusalRow = z.discriminatedUnion("result", [
+  z.object({ result: z.literal("already_used"), redeemed_at: z.coerce.date() }),
+  z.object({ result: z.enum(["not_found", "expired", "other_store", "admin_only"]) }),
+]);
+
+const refusalFromRow = (row: z.infer<typeof RedemptionRefusalRow>): RedemptionRefusal =>
+  row.result === "already_used"
+    ? { kind: "refused", error: row.result, redeemedAt: row.redeemed_at }
+    : { kind: "refused", error: row.result, redeemedAt: null };
+
+/** Primeiro nome, mesmo que o banco mande o nome inteiro. Sem nome → "Visitante". */
+const firstNameOf = (name: string): string => name.trim().split(/\s+/)[0] || "Visitante";
+
+/** jsonb de `public.preview_redemption` → DTO. Chaves extras (e-mail, telefone) são descartadas. */
+export const RedemptionPreviewRow = z
+  .union([
+    z.object({
+      result: z.literal("ok"),
+      benefit: RewardBenefit,
+      reward_title: z.string(),
+      store_id: StoreId.nullable(),
+      first_name: z.string(),
+      lifetime_points: z.number().int().nonnegative(),
+      expires_at: z.coerce.date(),
+    }),
+    RedemptionRefusalRow,
+  ])
+  .transform((row): RedemptionPreviewOutcome =>
+    row.result === "ok"
+      ? {
+          kind: "found",
+          preview: {
+            rewardTitle: row.reward_title,
+            benefitText: benefitLabel(row.benefit),
+            firstName: firstNameOf(row.first_name),
+            tier: tierFromPoints(row.lifetime_points),
+            expiresAt: row.expires_at,
+          },
+        }
+      : refusalFromRow(row),
+  );
+
+/** jsonb de `public.validate_redemption` → resultado da confirmação. */
+export const RedemptionValidateRow = z
+  .union([z.object({ result: z.literal("ok"), redeemed_at: z.coerce.date() }), RedemptionRefusalRow])
+  .transform((row): RedemptionValidateOutcome =>
+    row.result === "ok" ? { kind: "validated", redeemedAt: row.redeemed_at } : refusalFromRow(row),
+  );
+
+/* ------------------------------------------------------------------ */
 /* 13. Missões no painel (spec 003, T6)                                */
 /* ------------------------------------------------------------------ */
 
@@ -877,3 +1014,75 @@ export const MISSION_ADMIN_MESSAGES = {
     "Só uma missão ativa pode ser encerrada. Ela pode ter acabado ou ainda não ter começado: recarregue a página.",
   save_failed: "Não conseguimos salvar agora. Tente de novo em instantes.",
 } as const satisfies Record<MissionAdminError, string>;
+
+/* ------------------------------------------------------------------ */
+/* 14. Lista de espera (spec 002, T3/T4)                               */
+/* ------------------------------------------------------------------ */
+
+/** Campos do formulário da lista de espera, na ordem em que aparecem. */
+export const WAITLIST_FIELDS = ["name", "email", "profile", "company", "consentLgpd"] as const;
+export type WaitlistField = (typeof WAITLIST_FIELDS)[number];
+export type WaitlistFieldErrors = Partial<Record<WaitlistField, string>>;
+
+/** O que veio do formulário, ainda sem validar (para devolver ao usuário se algo falhar). */
+export const WaitlistDraft = z.object({
+  name: z.string(),
+  email: z.string(),
+  profile: z.string(),
+  company: z.string(),
+  consentLgpd: z.boolean(),
+});
+export type WaitlistDraft = z.infer<typeof WaitlistDraft>;
+
+/** Empresa é obrigatória só para lojista e shopping (doc 07). */
+export const COMPANY_REQUIRED_MESSAGES = {
+  lojista: "Conta pra gente o nome da sua loja",
+  shopping: "Conta pra gente o nome do shopping",
+} as const satisfies Record<Exclude<LeadProfile, "visitante">, string>;
+
+/**
+ * Regras do formulário (critério 4), com as mensagens de `LandingLead`. São dois
+ * schemas porque o Zod pula refinamentos quando outro campo já falhou: assim o
+ * erro da empresa aparece junto com os demais.
+ */
+export const WaitlistContact = z.object({
+  name: z.string().trim().min(2, "Conta pra gente seu nome").max(80, "Use até 80 caracteres no nome"),
+  email: z.string().trim().toLowerCase().max(254, "Confira o e-mail").pipe(z.email("Confira o e-mail")),
+  consentLgpd: LandingLead.shape.consentLgpd,
+});
+
+/** Perfil + empresa: empresa obrigatória só para lojista e shopping; visitante grava `null`. */
+export const WaitlistProfile = z
+  .object({
+    profile: z.enum(LEAD_PROFILES, { message: "Escolha se você é visitante, lojista ou shopping" }),
+    company: z.string().trim().max(80, "Use até 80 caracteres"),
+  })
+  .superRefine((v, ctx) => {
+    switch (v.profile) {
+      case "visitante":
+        return;
+      case "lojista":
+      case "shopping":
+        if (v.company.length < 2) {
+          ctx.addIssue({ code: "custom", path: ["company"], message: COMPANY_REQUIRED_MESSAGES[v.profile] });
+        }
+        return;
+      default:
+        return assertNever(v.profile);
+    }
+  })
+  .transform((v): Pick<JoinWaitlistInput, "profile" | "company"> => ({
+    profile: v.profile,
+    company: v.profile === "visitante" ? null : v.company,
+  }));
+
+/** Resposta de `public.join_waitlist`: e-mail novo ou já cadastrado (critério 6). */
+export const WaitlistOutcome = z.enum(["joined", "already_joined"]);
+export type WaitlistOutcome = z.infer<typeof WaitlistOutcome>;
+
+export const WAITLIST_OUTCOME_MESSAGES = {
+  joined: "Pronto, você está na lista! Avisamos por e-mail quando o Growlithe chegar ao seu shopping.",
+  already_joined: "Você já está na lista. É só aguardar: avisamos por e-mail quando o Growlithe chegar.",
+} as const satisfies Record<WaitlistOutcome, string>;
+
+export const WAITLIST_SAVE_FAILED_MESSAGE = "Não conseguimos salvar agora. Tente de novo em instantes.";
