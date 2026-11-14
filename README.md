@@ -241,12 +241,14 @@ Estado em **14/11, madrugada**: tudo na `main`, CI verde, banco Supabase com as 
 - **Painel (spec 003):** login por papel, checkpoints e QR, **missões** (criar, listar, encerrar), **validar cupom de resgate** e **dashboard** (check-ins, visitantes, scans por checkpoint, missões, resgates e conversão do A/B).
 - **Easter egg de sexta-feira 13 (spec 006):** mascote dormindo de 00h às 06h e chuva forte em Palmas. Na demo: `?easter=noite` e `?easter=chuva`.
 
+**No ar:** **https://growlithe-flax.vercel.app** (Vercel, funções em São Paulo `gru1`, cada merge na `main` publica sozinho). O endereço `growlithe-rohti-vm.vercel.app` é protegido pela Vercel (pede login): **não use no pitch**.
+
 **Roteiro da manhã (antes do pitch):**
 1. **Supabase → Authentication → URL Configuration → Redirect URLs:** adicionar `http://localhost:3000/**` (e o endereço da Vercel).
 2. `pnpm.cmd dev` → abrir `/painel` → pedir o link com o e-mail do admin → clicar no e-mail. Depois, no SQL Editor: `select private.grant_staff('<e-mail>', 'admin', null);` e recarregar.
 3. No painel: **Checkpoints → Imprimir QR** da "Entrada principal" (é o check-in, vale 20 pts). Crie uma missão de teste em **Missões**.
 4. No celular: escanear o QR → entrar com outro e-mail → informar o nome → ver os pontos. Abrir `/app`.
-5. Conectar o repositório à **Vercel** e cadastrar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (o `QR_SIGNING_SECRET` não é mais usado: o segredo vive no banco).
+5. ✅ Vercel conectada e variáveis cadastradas. No Supabase, a Site URL e as Redirect URLs devem apontar para `https://growlithe-flax.vercel.app` (e `/**`).
 6. Gravar o pitch de 90s até 12h30 (roteiro em `docs/11-plano-entrega-final.md`).
 
 **Decisões tomadas de madrugada, para revisar (⚠️ nas specs):** spec 004 D9–D15 (pontos base 10/20, caça ao tesouro fora de ordem, missão completa 1 vez, multiplicador relâmpago, nome no primeiro login, endereços, celebração de nível) e spec 006 D3–D7 (mascote original, Open-Meteo, limiar de chuva, card no lugar do mapa, `?easter=`).
