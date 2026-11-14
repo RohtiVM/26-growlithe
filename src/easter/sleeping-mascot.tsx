@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const DISMISS_KEY = "gl_easter_noite_fechado";
 
@@ -9,8 +9,9 @@ const DISMISS_KEY = "gl_easter_noite_fechado";
  * original de touca e pijama — dorme e manda o visitante dormir também.
  * Some ao tocar em "Até amanhã" e não volta nesta sessão.
  */
-export function SleepingMascot() {
+export function SleepingMascot({ forced = false }: { forced?: boolean }) {
   const [open, setOpen] = useState(false);
+  const button = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let dismissed = false;
@@ -19,22 +20,34 @@ export function SleepingMascot() {
     } catch {
       // Armazenamento bloqueado (aba anônima): mostra mesmo assim.
     }
-    setOpen(!dismissed);
-  }, []);
+    // Na demonstração (?easter=noite) aparece sempre, mesmo já fechado nesta aba.
+    setOpen(forced || !dismissed);
+  }, [forced]);
 
-  if (!open) return null;
-
-  const close = () => {
+  const close = useCallback(() => {
     try {
       window.sessionStorage.setItem(DISMISS_KEY, "1");
     } catch {
       // Sem armazenamento: fecha só nesta visualização.
     }
     setOpen(false);
-  };
+  }, []);
+
+  // Teclado: o foco vai para "Até amanhã" e o Esc fecha.
+  useEffect(() => {
+    if (!open) return;
+    button.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => { window.removeEventListener("keydown", onKey); };
+  }, [open, close]);
+
+  if (!open) return null;
 
   return (
-    <div className="egg-night" role="dialog" aria-modal="false" aria-labelledby="egg-night-title">
+    <div className="egg-night" role="dialog" aria-modal="true" aria-labelledby="egg-night-title">
       <div className="egg-night-card">
         <svg className="egg-mascot" viewBox="0 0 160 150" aria-hidden="true">
           {/* Lua e estrelas */}
@@ -74,7 +87,7 @@ export function SleepingMascot() {
         </p>
         <h2 id="egg-night-title">Psiu… o shopping está dormindo</h2>
         <p>O shopping está descansando para te receber amanhã… Vai dormir também!</p>
-        <button type="button" className="btn btn-block" onClick={close}>
+        <button ref={button} type="button" className="btn btn-block" onClick={close}>
           Até amanhã
         </button>
       </div>

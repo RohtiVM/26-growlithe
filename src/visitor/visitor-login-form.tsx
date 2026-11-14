@@ -37,6 +37,8 @@ export function VisitorLoginForm({ next, cta = "Receber link de acesso" }: { nex
         inputMode="email"
         placeholder="voce@email.com"
         required
+        defaultValue={state.status === "error" ? state.email : ""}
+        key={state.status === "error" ? `erro-${state.email}` : "email"}
         aria-invalid={state.status === "error"}
         aria-describedby={state.status === "error" ? "email-erro" : undefined}
       />

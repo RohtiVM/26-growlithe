@@ -7,7 +7,10 @@ import { safeNextPath } from "@/painel/access";
 import { VisitorNameInput } from "@/visitor/scan";
 import { createSupabaseServerClient } from "@/server/supabase";
 
-export type VisitorLinkState = { status: "idle" } | { status: "sent"; email: string } | { status: "error"; message: string };
+export type VisitorLinkState =
+  | { status: "idle" }
+  | { status: "sent"; email: string }
+  | { status: "error"; message: string; email: string };
 
 /** D1: o link mágico volta para onde o visitante estava (o scan ou a Home). */
 const visitorNext = (raw: FormDataEntryValue | null): string => {
@@ -16,8 +19,10 @@ const visitorNext = (raw: FormDataEntryValue | null): string => {
 };
 
 export async function sendVisitorMagicLink(_prev: VisitorLinkState, formData: FormData): Promise<VisitorLinkState> {
-  const parsed = SendMagicLinkInput.safeParse({ email: formData.get("email") });
-  if (!parsed.success) return { status: "error", message: parsed.error.issues[0]?.message ?? "Confira o e-mail" };
+  const raw = formData.get("email");
+  const typed = typeof raw === "string" ? raw : "";
+  const parsed = SendMagicLinkInput.safeParse({ email: raw });
+  if (!parsed.success) return { status: "error", message: parsed.error.issues[0]?.message ?? "Confira o e-mail", email: typed };
 
   const next = visitorNext(formData.get("next"));
   const origin = (await headers()).get("origin") ?? "http://localhost:3000";
@@ -27,7 +32,7 @@ export async function sendVisitorMagicLink(_prev: VisitorLinkState, formData: Fo
     options: { emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
   });
   if (error !== null) {
-    return { status: "error", message: "Não conseguimos enviar o link agora. Tente de novo em 1 minuto." };
+    return { status: "error", message: "Não conseguimos enviar o link agora. Tente de novo em 1 minuto.", email: typed };
   }
   return { status: "sent", email: parsed.data.email };
 }

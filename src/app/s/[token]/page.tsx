@@ -7,7 +7,7 @@ import { scanOutcomeFromRow, TIER_LABEL } from "@/visitor/scan";
 import { VisitorLoginForm } from "@/visitor/visitor-login-form";
 import { VisitorShell } from "@/visitor/visitor-shell";
 
-export const metadata: Metadata = { title: "Escaneou! · Growlithe" };
+export const metadata: Metadata = { title: "QR Code · Growlithe" };
 export const dynamic = "force-dynamic";
 
 const TOKEN = /^[A-Za-z0-9_-]{20,600}$/;
@@ -23,20 +23,25 @@ export default async function ScanPage({ params }: { params: Promise<{ token: st
 
   // D1: sem login, o primeiro scan vira o cadastro; o link mágico volta para cá.
   if (visitor.kind === "anonymous") {
+    if (!TOKEN.test(token)) {
+      return (
+        <main className="auth-shell">
+          <div className="auth-card card reveal reveal-1" role="alert">
+            <span className="icon-tile"><AlertTriangle size={22} aria-hidden /></span>
+            <h1>Esse QR Code não é do Growlithe</h1>
+            <p className="lead">Procure os QR Codes com a marca Growlithe na entrada, nas lojas e nos eventos do shopping.</p>
+            <a className="btn btn-block" href="/">Conhecer o Growlithe</a>
+          </div>
+        </main>
+      );
+    }
     return (
       <main className="auth-shell">
         <div className="auth-card card reveal reveal-1">
           <span className="icon-tile"><MapPin size={22} aria-hidden /></span>
           <h1>Você achou um ponto Growlithe!</h1>
           <p className="lead">Entre com seu e-mail para receber os pontos deste QR Code. Leva 10 segundos.</p>
-          {TOKEN.test(token) ? (
-            <VisitorLoginForm next={here} cta="Receber meus pontos" />
-          ) : (
-            <p className="alert" role="alert">
-              <AlertTriangle size={18} aria-hidden style={{ flex: "none", marginTop: 2 }} />
-              Esse QR Code não é do Growlithe.
-            </p>
-          )}
+          <VisitorLoginForm next={here} cta="Receber meus pontos" />
         </div>
       </main>
     );

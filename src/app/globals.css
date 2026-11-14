@@ -24,6 +24,9 @@
   --tier-diamante: #9fd8f5;
   --tier-ink: #111111;
 
+  /* Erro: não depende da primária (no tema claro ela é azul, igual ao foco). AA nos dois temas. */
+  --color-danger: #b42318;
+
   --font-heading: var(--font-display), "Space Grotesk", system-ui, sans-serif;
   --font-text: var(--font-body), "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
@@ -32,6 +35,12 @@
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-danger: #ff7a66;
+  }
 }
 
 html {
@@ -191,6 +200,7 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 44px;
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 1.125rem;
@@ -211,7 +221,7 @@ textarea {
 
 .nav-link {
   display: none;
-  padding: 8px 12px;
+  padding: 12px;
   border-radius: var(--radius-pill);
   font-size: 0.9375rem;
   color: var(--color-textMuted);
@@ -271,7 +281,7 @@ textarea {
 }
 
 .btn-sm {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 16px;
   font-size: 0.875rem;
 }
@@ -709,7 +719,7 @@ textarea {
 }
 
 .form input[aria-invalid="true"] {
-  border-color: var(--color-primary);
+  border-color: var(--color-danger);
 }
 
 .form .btn {
@@ -723,6 +733,16 @@ textarea {
   gap: 8px;
   margin: 4px 0 0;
   font-size: 0.9375rem;
+}
+
+.field-error,
+.card .field-error {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.alert {
+  margin-top: 12px;
 }
 
 .alert {
