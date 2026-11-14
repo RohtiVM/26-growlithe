@@ -7,6 +7,17 @@
 >
 > 🌐 **MVP no ar: https://growlithe-flax.vercel.app** · Entrega 1 (planejamento, 13/11) · MVP final (14/11)
 
+### 📦 Entrega final (14/11)
+
+| Item pedido | Onde está |
+|---|---|
+| MVP funcional | **https://growlithe-flax.vercel.app** |
+| Repositório | este repositório (público) |
+| Documentação técnica | este README, seções 3–4, e [`docs/`](docs/) (arquitetura, modelo de dados, stack, specs) |
+| Instruções de execução | [`docs/EXECUCAO.md`](docs/EXECUCAO.md) |
+| Resumo de uma página para os avaliadores | [`docs/Growlithe-resumo-avaliadores.pdf`](docs/Growlithe-resumo-avaliadores.pdf) · [versão em texto](docs/RESUMO-AVALIADORES.md) |
+| Vídeo de 90 segundos | entregue à parte pela equipe |
+
 ---
 
 ## 1. Nome do projeto e descrição (pitch)
@@ -220,6 +231,8 @@ Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), 
 **Qualidade:** TypeScript strict sem `any`/`as`, 188 testes Vitest, testes de banco (RLS e regras) num Postgres temporário, CI em todo PR (tipos, lint, testes, build e banco).
 
 ### Como rodar
+
+Passo a passo completo, inclusive criando um banco Supabase próprio: [`docs/EXECUCAO.md`](docs/EXECUCAO.md).
 
 ```bash
 pnpm install          # no Windows/PowerShell: pnpm.cmd
