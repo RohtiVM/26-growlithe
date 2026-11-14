@@ -933,3 +933,75 @@ export const RedemptionValidateRow = z
   .transform((row): RedemptionValidateOutcome =>
     row.result === "ok" ? { kind: "validated", redeemedAt: row.redeemed_at } : refusalFromRow(row),
   );
+
+/* ------------------------------------------------------------------ */
+/* 14. Lista de espera (spec 002, T3/T4)                               */
+/* ------------------------------------------------------------------ */
+
+/** Campos do formulário da lista de espera, na ordem em que aparecem. */
+export const WAITLIST_FIELDS = ["name", "email", "profile", "company", "consentLgpd"] as const;
+export type WaitlistField = (typeof WAITLIST_FIELDS)[number];
+export type WaitlistFieldErrors = Partial<Record<WaitlistField, string>>;
+
+/** O que veio do formulário, ainda sem validar (para devolver ao usuário se algo falhar). */
+export const WaitlistDraft = z.object({
+  name: z.string(),
+  email: z.string(),
+  profile: z.string(),
+  company: z.string(),
+  consentLgpd: z.boolean(),
+});
+export type WaitlistDraft = z.infer<typeof WaitlistDraft>;
+
+/** Empresa é obrigatória só para lojista e shopping (doc 07). */
+export const COMPANY_REQUIRED_MESSAGES = {
+  lojista: "Conta pra gente o nome da sua loja",
+  shopping: "Conta pra gente o nome do shopping",
+} as const satisfies Record<Exclude<LeadProfile, "visitante">, string>;
+
+/**
+ * Regras do formulário (critério 4), com as mensagens de `LandingLead`. São dois
+ * schemas porque o Zod pula refinamentos quando outro campo já falhou: assim o
+ * erro da empresa aparece junto com os demais.
+ */
+export const WaitlistContact = z.object({
+  name: z.string().trim().min(2, "Conta pra gente seu nome").max(80, "Use até 80 caracteres no nome"),
+  email: z.string().trim().toLowerCase().max(254, "Confira o e-mail").pipe(z.email("Confira o e-mail")),
+  consentLgpd: LandingLead.shape.consentLgpd,
+});
+
+/** Perfil + empresa: empresa obrigatória só para lojista e shopping; visitante grava `null`. */
+export const WaitlistProfile = z
+  .object({
+    profile: z.enum(LEAD_PROFILES, { message: "Escolha se você é visitante, lojista ou shopping" }),
+    company: z.string().trim().max(80, "Use até 80 caracteres"),
+  })
+  .superRefine((v, ctx) => {
+    switch (v.profile) {
+      case "visitante":
+        return;
+      case "lojista":
+      case "shopping":
+        if (v.company.length < 2) {
+          ctx.addIssue({ code: "custom", path: ["company"], message: COMPANY_REQUIRED_MESSAGES[v.profile] });
+        }
+        return;
+      default:
+        return assertNever(v.profile);
+    }
+  })
+  .transform((v): Pick<JoinWaitlistInput, "profile" | "company"> => ({
+    profile: v.profile,
+    company: v.profile === "visitante" ? null : v.company,
+  }));
+
+/** Resposta de `public.join_waitlist`: e-mail novo ou já cadastrado (critério 6). */
+export const WaitlistOutcome = z.enum(["joined", "already_joined"]);
+export type WaitlistOutcome = z.infer<typeof WaitlistOutcome>;
+
+export const WAITLIST_OUTCOME_MESSAGES = {
+  joined: "Pronto, você está na lista! Avisamos por e-mail quando o Growlithe chegar ao seu shopping.",
+  already_joined: "Você já está na lista. É só aguardar: avisamos por e-mail quando o Growlithe chegar.",
+} as const satisfies Record<WaitlistOutcome, string>;
+
+export const WAITLIST_SAVE_FAILED_MESSAGE = "Não conseguimos salvar agora. Tente de novo em instantes.";

@@ -2,6 +2,8 @@ import { cookies } from "next/headers";
 import { Flame, Gift, Plus, ScanLine, Store, Target, Zap, BarChart3, Users } from "lucide-react";
 import { AB_COOKIE, HEADLINES, parseVariant } from "@/landing/ab-test";
 import { Countdown } from "@/landing/countdown";
+import { readUtm } from "@/landing/waitlist";
+import { WaitlistForm } from "@/landing/waitlist-form";
 import { TIERS, TIER_THRESHOLDS, type Tier } from "@/domain/schemas";
 
 const TIER_INFO = {
@@ -46,8 +48,13 @@ const FAQ = [
 
 const fmt = (n: number): string => n.toLocaleString("pt-BR");
 
-export default async function LandingPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function LandingPage({ searchParams }: { searchParams: SearchParams }) {
   const cookieStore = await cookies();
+  const params = await searchParams;
+  // D6: UTM do cartaz/QR lida aqui no servidor; a Server Action revalida.
+  const utm = readUtm({ source: params.utm_source, medium: params.utm_medium, campaign: params.utm_campaign });
   const variant = parseVariant(cookieStore.get(AB_COOKIE)?.value) ?? "A";
 
   return (
@@ -187,9 +194,8 @@ export default async function LandingPage() {
         <section className="container" id="lista-de-espera">
           <div className="panel-block waitlist">
             <h2>Entre na lista de espera</h2>
-            <p className="lead" style={{ marginInline: "auto" }}>
-              O cadastro abre em breve. Visitantes, lojistas e shoppings vão poder entrar por aqui.
-            </p>
+            <p className="lead">Avisamos quando o Growlithe chegar ao seu shopping.</p>
+            <WaitlistForm utm={utm} />
           </div>
         </section>
       </main>

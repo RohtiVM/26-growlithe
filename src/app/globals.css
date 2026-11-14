@@ -665,7 +665,10 @@ a {
 .waitlist {
   max-width: 640px;
   margin: 0 auto;
-  text-align: center;
+}
+
+.waitlist .lead {
+  margin-bottom: 8px;
 }
 
 .footer {
@@ -740,6 +743,91 @@ a {
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   background: var(--color-surfaceAlt);
+}
+
+/* Lista de espera (spec 002): nome e e-mail lado a lado, perfil em pílulas. */
+.waitlist-row {
+  display: grid;
+  gap: 0 16px;
+}
+
+@media (min-width: 640px) {
+  .waitlist-row {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.choice-group {
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.choice-group legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.form .choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-background);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.form .choice:has(input:checked) {
+  border-color: var(--color-primary);
+}
+
+.form .choice:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.form .choice input,
+.form .consent input {
+  min-height: 0;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--color-primary);
+}
+
+.form .consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 16px;
+  font-weight: 400;
+  color: var(--color-textMuted);
+  cursor: pointer;
+}
+
+.form .consent input {
+  flex: none;
+  margin-top: 2px;
+}
+
+.waitlist-done {
+  margin-top: 16px;
 }
 
 /* ------------------------------------------------------------------ */
