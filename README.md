@@ -237,7 +237,7 @@ Estado em 14/11, madrugada: tudo commitado na `main`, CI verde. **Nenhuma mudan�
 
 1. ⏳ **Configurar o redirect do login:** no Supabase, *Authentication → URL Configuration → Redirect URLs*, adicionar `http://localhost:3000/**` (e o endereço da Vercel quando existir).
 2. ⏳ **Primeiro login e promoção a admin:** rodar `pnpm dev`, abrir `/painel`, pedir o link com o e-mail do time e abrir o e-mail (deve aparecer "Você não tem acesso ao painel"). Depois, no SQL Editor do Supabase: `select private.grant_staff('<e-mail>', 'admin', null);` e recarregar a página.
-3. Painel T5 (#7): cadastrar checkpoints e imprimir os QR Codes (usa `src/server/qr-token.ts`).
+3. ✅ Painel T5 (#7): `/painel/checkpoints` cadastra pontos e `/painel/checkpoints/<id>/qr` imprime o QR assinado (válido por 1 ano). Falta testar logado como admin (depende do item 2).
 4. Conectar o repositório à Vercel e cadastrar as variáveis do `.env.example`.
 5. Spec 004: check-in e missão por QR (scan, pontos e Home do visitante).
 6. Spec 002, T3–T5: formulário da lista de espera gravando leads.
@@ -246,7 +246,7 @@ Estado em 14/11, madrugada: tudo commitado na `main`, CI verde. **Nenhuma mudan�
 **Em outro computador:** `git clone`, `pnpm install` e criar o `.env.local` a partir do `.env.example`:
 - `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: a chave *publishable* em *Project Settings → API keys*.
-- `QR_SIGNING_SECRET`: 32+ caracteres aleatórios. Use o **mesmo** valor em todos os ambientes, senão os QR impressos deixam de valer.
+- `QR_SIGNING_SECRET`: 32+ caracteres aleatórios. **Já gerado** no `.env.local` do computador de 14/11; copie de lá para a Vercel e para outros computadores. Use o **mesmo** valor em todos os ambientes, senão os QR impressos deixam de valer.
 - `SUPABASE_SERVICE_ROLE_KEY`: chave *secret*, só servidor. Ainda não é usada pelo código.
 
 PRs #12, #13 e #14 estão abertos no GitHub, mas o conteúdo já está na `main`: podem ser fechados.
