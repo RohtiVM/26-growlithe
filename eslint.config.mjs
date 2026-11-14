@@ -4,7 +4,19 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: [".next/**", "node_modules/**", "next-env.d.ts", "*.config.*"] },
+  {
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "next-env.d.ts",
+      "*.config.*",
+      // Pastas de ferramentas locais (skills/agentes do editor), fora do código do app.
+      ".claude/**",
+      ".github/**",
+      ".impeccable/**",
+      ".omc/**",
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {

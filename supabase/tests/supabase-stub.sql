@@ -15,3 +15,6 @@ grant usage on schema public to anon, authenticated, service_role;
 -- Sem isto, os testes passariam mesmo com a migration esquecendo de revogar.
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+-- Como no Supabase: pgcrypto no schema extensions (hmac, gen_random_bytes).
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;

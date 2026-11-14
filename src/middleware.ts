@@ -40,4 +40,4 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   return request.nextUrl.pathname === "/" ? withAbVariant(request) : withSupabaseSession(request);
 }
 
-export const config = { matcher: ["/", "/painel/:path*", "/auth/:path*"] };
+export const config = { matcher: ["/", "/painel/:path*", "/auth/:path*", "/app/:path*", "/s/:path*"] };
