@@ -935,6 +935,87 @@ export const RedemptionValidateRow = z
   );
 
 /* ------------------------------------------------------------------ */
+/* 13. Missões no painel (spec 003, T6)                                */
+/* ------------------------------------------------------------------ */
+
+/** Linha de `public.missions` → domínio. Validada na borda, sem `as`. */
+export const MissionRow = z
+  .object({
+    id: MissionId,
+    title: Mission.shape.title,
+    description: Mission.shape.description,
+    requirement: MissionRequirement,
+    points_reward: Mission.shape.pointsReward,
+    starts_at: z.coerce.date(),
+    ends_at: z.coerce.date(),
+    max_completions_per_user: Mission.shape.maxCompletionsPerUser,
+    store_id: StoreId.nullable(),
+    launch: MissionLaunch,
+    created_at: z.coerce.date(),
+  })
+  .transform((r): Mission => ({
+    id: r.id,
+    title: r.title,
+    description: r.description,
+    requirement: r.requirement,
+    pointsReward: r.points_reward,
+    startsAt: r.starts_at,
+    endsAt: r.ends_at,
+    maxCompletionsPerUser: r.max_completions_per_user,
+    storeId: r.store_id,
+    launch: r.launch,
+    createdAt: r.created_at,
+  }));
+
+/** RF10: em que momento a missão está em relação a agora. */
+export const MISSION_PERIODS = ["active", "upcoming", "ended"] as const;
+export type MissionPeriod = (typeof MISSION_PERIODS)[number];
+
+export const MISSION_PERIOD_LABELS = {
+  active: "Ativas",
+  upcoming: "Futuras",
+  ended: "Encerradas",
+} as const satisfies Record<MissionPeriod, string>;
+
+/** Vale de `startsAt` (inclusive) até `endsAt` (exclusive): encerrar = `endsAt` vira agora. */
+export const missionPeriod = (m: Pick<Mission, "startsAt" | "endsAt">, now: Date): MissionPeriod => {
+  if (m.startsAt > now) return "upcoming";
+  if (m.endsAt <= now) return "ended";
+  return "active";
+};
+
+/**
+ * Agrupa para a lista do painel. Ativas: a que acaba antes vem primeiro.
+ * Futuras: a que começa antes. Encerradas: a que acabou por último.
+ */
+export const groupMissionsByPeriod = (
+  missions: readonly Mission[],
+  now: Date,
+): Record<MissionPeriod, Mission[]> => {
+  const byTime = (pick: (m: Mission) => Date, dir: 1 | -1) => (a: Mission, b: Mission) =>
+    dir * (pick(a).getTime() - pick(b).getTime());
+  const of = (period: MissionPeriod) => missions.filter((m) => missionPeriod(m, now) === period);
+  return {
+    active: of("active").sort(byTime((m) => m.endsAt, 1)),
+    upcoming: of("upcoming").sort(byTime((m) => m.startsAt, 1)),
+    ended: of("ended").sort(byTime((m) => m.endsAt, -1)),
+  };
+};
+
+/** Encerrar missão (UC4): só o id vem do cliente. */
+export const EndMissionInput = z.object({ missionId: MissionId });
+export type EndMissionInput = z.infer<typeof EndMissionInput>;
+
+export const MISSION_ADMIN_ERRORS = ["mission_not_active", "save_failed"] as const;
+export type MissionAdminError = (typeof MISSION_ADMIN_ERRORS)[number];
+
+export const MISSION_ADMIN_MESSAGES = {
+  mission_not_active:
+    "Só uma missão ativa pode ser encerrada. Ela pode ter acabado ou ainda não ter começado: recarregue a página.",
+  save_failed: "Não conseguimos salvar agora. Tente de novo em instantes.",
+} as const satisfies Record<MissionAdminError, string>;
+
+/* ------------------------------------------------------------------ */
 /* 14. Lista de espera (spec 002, T3/T4)                               */
 /* ------------------------------------------------------------------ */
 

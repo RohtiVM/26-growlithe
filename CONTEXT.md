@@ -13,6 +13,7 @@
 | **Missão Relâmpago** | Missão surpresa, anunciada por push, curta e com pontos multiplicados | `launch.type = "flash"` |
 | **Caça ao tesouro** | Missão de vários QR Codes em ordem | `qr_scan` com `ordered: true` |
 | **Sequência** | Visitas em dias seguidos | `visit_streak` |
+| **Encerrar missão** | Antecipar o fim de uma missão ativa para agora; ela vai para "Encerradas" e ninguém mais pontua nela. Missão futura não é encerrada | `endMission`, `ends_at = now()` |
 | **Cupom fiscal** | Comprovante da compra (NFC-e, modelo 65) com QR Code da SEFAZ | `NfceQrUrl`, tabela `receipts` |
 | **Chave de acesso** | Identificador de 44 posições da nota; traz CNPJ e mês | `NfceAccessKey` |
 | **Pontos** | Saldo gastável em recompensas | `User.points` |

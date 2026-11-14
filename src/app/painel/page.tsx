@@ -13,7 +13,7 @@ type Tile = { icon: LucideIcon; title: string; text: string } & ({ href: string 
 const TILES: readonly Tile[] = [
   { icon: TicketCheck, title: "Validar cupom de resgate", text: "Digite os 6 dígitos que o visitante mostrar.", href: "/painel/validar" },
   { icon: QrCode, title: "Checkpoints e QR", text: "Cadastre pontos físicos e imprima os QR Codes.", href: "/painel/checkpoints" },
-  { icon: Target, title: "Missões", text: "Crie missões e lance uma Missão Relâmpago.", ticket: "T6" },
+  { icon: Target, title: "Missões", text: "Crie missões e lance uma Missão Relâmpago.", href: "/painel/missoes" },
   { icon: BarChart3, title: "Dashboard", text: "Check-ins, scans por checkpoint, resgates e leads da landing.", ticket: "T9" },
 ];
 
