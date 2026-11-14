@@ -1,4 +1,4 @@
-import { Flame, LogOut, Store, ShieldCheck } from "lucide-react";
+import { Flame, LogOut, Smartphone, Store, ShieldCheck } from "lucide-react";
 import type { StaffMember } from "@/domain/schemas";
 import { ThemeToggle } from "@/ui/theme-toggle";
 import { signOut } from "./actions";
@@ -17,6 +17,9 @@ export function PainelHeader({ staff }: { staff: StaffMember }) {
           <Flame size={20} aria-hidden /> Painel
         </a>
         <form action={signOut} className="nav-actions">
+          <a className="btn btn-secondary btn-sm" href="/app" title="Ver o app como o visitante vê">
+            <Smartphone size={16} aria-hidden /> <span className="hide-sm">Visitante</span>
+          </a>
           <ThemeToggle />
           <span className="role-chip">
             <RoleIcon size={14} aria-hidden /> {ROLE_LABEL[staff.role]}

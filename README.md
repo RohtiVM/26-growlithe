@@ -31,6 +31,8 @@
 3. **Veja o lado do shopping:** abra **https://growlithe-flax.vercel.app/painel** no mesmo celular. Como avaliador você entra como **admin**: veja o **Dashboard** (o seu scan já aparece), crie uma missão em **Missões** e imprima QR Codes em **Checkpoints**.
 4. **Bônus:** `/?easter=noite` e `/?easter=chuva` mostram o easter egg de sexta-feira 13; o botão ☀️/🌙 troca o tema.
 
+**No notebook, sem celular?** Abra **https://growlithe-flax.vercel.app**, clique em **"Avaliador? Teste agora, sem cadastro"** e siga o *Guia do avaliador* que aparece no app: os botões *QR 1* e *QR 2* fazem o scan com um clique. Para alternar entre as duas áreas, use o ícone de **painel** no topo do app e o botão **Visitante** no topo do painel.
+
 O acesso de avaliador vale até **15/11 às 23h59** e depois expira sozinho. Cada conta pontua uma vez por dia em cada ponto (antifraude).
 
 ---

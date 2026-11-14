@@ -9,6 +9,7 @@ import { firstName, getVisitor } from "@/server/visitor";
 import { loadRainStores, loadVisitorHome } from "@/visitor/data";
 import { tierProgress, TIER_LABEL } from "@/visitor/scan";
 import { VisitorShell } from "@/visitor/visitor-shell";
+import { EvaluatorGuide } from "@/visitor/evaluator-guide";
 
 export const metadata: Metadata = { title: "Início · Growlithe" };
 export const dynamic = "force-dynamic";
@@ -34,13 +35,15 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const featured = missions.filter((m) => !m.flash).slice(0, 4);
 
   return (
-    <VisitorShell tab="inicio" points={visitor.points}>
+    <VisitorShell tab="inicio" points={visitor.points} staff={visitor.isStaff}>
       {egg === "noite" && <SleepingMascot forced={forcedNight} />}
       {egg === "chuva" && <RainLayer />}
       <div className="v-greeting reveal reveal-1">
         <p className="muted v-date">{dateInPalmas(new Date())}</p>
         <h1>Olá, {firstName(visitor.name)}</h1>
       </div>
+
+      {visitor.isEvaluator && <EvaluatorGuide />}
 
       <section className="card v-tier reveal reveal-2" aria-label="Seu nível">
         <div className="v-tier-row">

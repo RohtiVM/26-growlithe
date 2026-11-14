@@ -15,3 +15,15 @@ export const evaluatorRoleExpired = (until: string | null, now: Date): boolean =
   const t = Date.parse(until);
   return Number.isNaN(t) || t <= now.getTime();
 };
+
+/** QR Codes da "Caça ao tesouro do avaliador" (os mesmos do guia no README e no resumo). */
+export const EVALUATOR_QR = [
+  {
+    label: "QR 1 · Entrada",
+    path: "/s/eyJ2IjogMSwgImNwIjogImMxMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMSIsICJleHAiOiAxODI2MTk0NTM0LCAic2lnIjogImM3ZWM3MDliODg2ZTI0MzU1MmFhYzMwNDYyODdhY2JlYWIwMjgwYzk5MjIyM2QyNjE3ZmI1Y2RiMzM3NWJiYzkifQ",
+  },
+  {
+    label: "QR 2 · Praça de alimentação",
+    path: "/s/eyJ2IjogMSwgImNwIjogImMxMDAwMDAwLTAwMDAtNDAwMC04MDAwLTAwMDAwMDAwMDAwMiIsICJleHAiOiAxODI2MTk1MDc0LCAic2lnIjogImZiNjUyMDI3Zjc1NDMyMzBmMWU4MDFmODExZTI1MmQ1YjNlNDY2ODFmMzA3NjdiYTBjMTA3NGY3OGZkN2U2ZGUifQ",
+  },
+] as const;

@@ -1,11 +1,22 @@
 import type { ReactNode } from "react";
-import { Flame, Home, ScanLine, Target } from "lucide-react";
+import { Flame, Home, LayoutDashboard, ScanLine, Target } from "lucide-react";
 import { ThemeToggle } from "@/ui/theme-toggle";
 
 type Tab = "inicio" | "missoes" | "none";
 
 /** Moldura do app do visitante: topo com marca e saldo, barra de abas embaixo (wireframe 01). */
-export function VisitorShell({ children, points, tab }: { children: ReactNode; points?: number; tab: Tab }) {
+export function VisitorShell({
+  children,
+  points,
+  tab,
+  staff = false,
+}: {
+  children: ReactNode;
+  points?: number;
+  tab: Tab;
+  /** Admin ou lojista: mostra o atalho para o painel (spec 008). */
+  staff?: boolean;
+}) {
   return (
     <div className="v-shell">
       <header className="v-top">
@@ -14,6 +25,11 @@ export function VisitorShell({ children, points, tab }: { children: ReactNode; p
         </a>
         <div className="v-top-actions">
           {points !== undefined && <span className="v-points tabular">{points.toLocaleString("pt-BR")} pts</span>}
+          {staff && (
+            <a className="v-panel-link" href="/painel" aria-label="Abrir o painel do shopping" title="Painel do shopping">
+              <LayoutDashboard size={20} aria-hidden />
+            </a>
+          )}
           <ThemeToggle />
         </div>
       </header>

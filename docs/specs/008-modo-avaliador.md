@@ -36,3 +36,4 @@ Um botão **"Entrar como avaliador"** cria uma sessão anônima (sem e-mail) e d
 | T1 | Banco: prazo do modo avaliador, `claim_evaluator_access()` e `staff_role()` respeitando o prazo + testes |
 | T2 | Botão "Entrar como avaliador" no scan, no login do visitante e no login do painel |
 | T3 | Missão de demonstração e QR Codes no guia (README e resumo) |
+| T4 | Sem dor de cabeça: botão "Testar agora" na landing, guia do avaliador na Home com os QR como links, atalhos Painel ↔ Visitante |

@@ -63,7 +63,7 @@ export default async function ScanPage({ params }: { params: Promise<{ token: st
   if (outcome.kind === "error") {
     const Icon = outcome.error === "already_scanned_today" ? Clock : AlertTriangle;
     return (
-      <VisitorShell tab="none" points={visitor.points}>
+      <VisitorShell tab="none" points={visitor.points} staff={visitor.isStaff}>
         <section className="scan-result scan-result-error reveal reveal-1" role="alert">
           <span className="icon-tile"><Icon size={26} aria-hidden /></span>
           <h1>{outcome.error === "already_scanned_today" ? "Esse você já pegou hoje" : "Não deu certo"}</h1>
@@ -77,7 +77,7 @@ export default async function ScanPage({ params }: { params: Promise<{ token: st
   }
 
   return (
-    <VisitorShell tab="none" points={outcome.balance}>
+    <VisitorShell tab="none" points={outcome.balance} staff={visitor.isStaff}>
       <section className="scan-result reveal reveal-1" aria-live="polite">
         {outcome.tierUp !== null ? (
           <div className="tier-up">
