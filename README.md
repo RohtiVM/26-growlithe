@@ -234,6 +234,8 @@ Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), 
 
 **No ar:** **https://growlithe-flax.vercel.app** — Vercel, funções em São Paulo (`gru1`), banco Supabase em São Paulo. Cada merge na `main` publica sozinho e cada PR ganha um link de prévia. O endereço `growlithe-rohti-vm.vercel.app` é protegido pela Vercel (pede login): **não use no pitch**.
 
+**Pitch em vídeo (90s):** [pasta no Google Drive](https://drive.google.com/drive/folders/1HnbZgDDafRDLrcILaWlRbN8c1phL2b7P) · o que o vídeo diz e onde cada afirmação está no MVP: [`docs/12-pitch-90s.md`](docs/12-pitch-90s.md)
+
 | Área | Rotas | Spec |
 |---|---|---|
 | Landing com teste A/B e lista de espera (prática sorteada) | `/` | [002](docs/specs/002-landing-page.md) |
@@ -288,6 +290,7 @@ growlithe/
 ├── docs/
 │   ├── 01–10                     # planejamento da Entrega 1 (telas, visão, dados, arquitetura, stack…)
 │   ├── 11-plano-entrega-final.md # prazos de 14/11, critérios e ordem de entrega
+│   ├── 12-pitch-90s.md           # o que o vídeo de 90s diz e onde está no MVP
 │   ├── specs/                    # 000-template · 001 a 004 · 006 a 008
 │   └── wireframes/               # telas em PNG, tema escuro e claro
 ├── src/
