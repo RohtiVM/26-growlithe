@@ -1,6 +1,6 @@
 # Growlithe — Time 26
 
-**Missões que fazem você voltar ao shopping.** · MVP no ar: **growlithe-flax.vercel.app** · Código: **github.com/RohtiVM/26-growlithe** · **Experimente:** escaneie o QR 1 e depois o QR 2, toque em *Entrar como avaliador* (sem e-mail) e abra `/painel` para ver o lado do shopping.
+**Missões que fazem você voltar ao shopping.** · MVP no ar: **growlithe-flax.vercel.app** · Código: **github.com/RohtiVM/26-growlithe** · **Pitch (90s):** [vídeo no Google Drive](https://drive.google.com/drive/folders/1HnbZgDDafRDLrcILaWlRbN8c1phL2b7P) · **Experimente:** escaneie o QR 1 e depois o QR 2, toque em *Entrar como avaliador* (sem e-mail) e abra `/painel` para ver o lado do shopping.
 
 **1. Nome do projeto.** Growlithe: web app gamificado de engajamento e fidelização para o Shopping Capim Dourado (Palmas, TO).
 

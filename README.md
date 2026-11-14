@@ -5,7 +5,7 @@
 > **Missões que fazem você voltar ao shopping.**
 > Hackathon · Desafio **05. Engajamento e fidelização dos visitantes** · Shopping Capim Dourado, Palmas (TO)
 >
-> 🌐 **MVP no ar: https://growlithe-flax.vercel.app** · Entrega 1 (planejamento, 13/11) · MVP final (14/11)
+> 🌐 **MVP no ar: https://growlithe-flax.vercel.app** · 🎥 **[Pitch em vídeo (90s)](https://drive.google.com/drive/folders/1HnbZgDDafRDLrcILaWlRbN8c1phL2b7P)** · Entrega 1 (planejamento, 13/11) · MVP final (14/11)
 
 ### 📦 Entrega final (14/11)
 
@@ -16,7 +16,20 @@
 | Documentação técnica | este README, seções 3–4, e [`docs/`](docs/) (arquitetura, modelo de dados, stack, specs) |
 | Instruções de execução | [`docs/EXECUCAO.md`](docs/EXECUCAO.md) |
 | Resumo de uma página para os avaliadores | [`docs/Growlithe-resumo-avaliadores.pdf`](docs/Growlithe-resumo-avaliadores.pdf) · [versão em texto](docs/RESUMO-AVALIADORES.md) |
-| Vídeo de 90 segundos | entregue à parte pela equipe |
+| Vídeo de 90 segundos | **[Assistir no Google Drive](https://drive.google.com/drive/folders/1HnbZgDDafRDLrcILaWlRbN8c1phL2b7P)** · resumo logo abaixo · explicação completa em [`docs/12-pitch-90s.md`](docs/12-pitch-90s.md) |
+
+### 🎥 Resumo do pitch de 90 segundos
+
+**[▶ Assistir ao vídeo](https://drive.google.com/drive/folders/1HnbZgDDafRDLrcILaWlRbN8c1phL2b7P)**
+
+| Bloco | O que dizemos | Por que importa |
+|---|---|---|
+| **Apresentação** | Somos o Time 26 e este é o **Growlithe: missões que fazem você voltar ao shopping**. | O objetivo é a **volta** do visitante: fidelização (desafio 05). |
+| **Problema** | *Por que um shopping precisa ter vínculo com as pessoas?* Segundo **Philip Kotler**, conquistar um novo cliente custa **de 5 a 7 vezes mais** do que manter um atual. Só que o shopping costuma ser mais caro e, com o **poder de compra apertado**, muita gente só vai quando precisa: entra, compra e vai embora. | Perder o visitante custa caro, e hoje ele não tem motivo para voltar. O shopping nem sabe quem veio. |
+| **Solução** | Web app que abre pela câmera do celular, **sem instalar nada**. O visitante escaneia QR Codes, cumpre missões e ganha pontos **só por passear, sem precisar gastar**. Com a **Missão Relâmpago**, o shopping movimenta uma ala vazia em minutos. | Recompensa **comportamento**, não só gasto: responde ao poder de compra e dá motivo para voltar. |
+| **MVP** | Já está no ar: o visitante escaneia e ganha pontos; o shopping cria missões e acompanha tudo num dashboard. | Tudo o que o vídeo diz funciona hoje. Teste com o guia abaixo. |
+
+O vídeo não promete o que ainda não está pronto: a validação da compra pelo QR do cupom fiscal (spec 001) é o próximo passo. Detalhes em [`docs/12-pitch-90s.md`](docs/12-pitch-90s.md).
 
 ### 📱 Guia rápido para os avaliadores (5 minutos, no seu celular)
 
@@ -233,8 +246,6 @@ Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), 
 ## Estado do MVP (14/11)
 
 **No ar:** **https://growlithe-flax.vercel.app** — Vercel, funções em São Paulo (`gru1`), banco Supabase em São Paulo. Cada merge na `main` publica sozinho e cada PR ganha um link de prévia. O endereço `growlithe-rohti-vm.vercel.app` é protegido pela Vercel (pede login): **não use no pitch**.
-
-**Pitch em vídeo (90s):** [pasta no Google Drive](https://drive.google.com/drive/folders/1HnbZgDDafRDLrcILaWlRbN8c1phL2b7P) · o que o vídeo diz e onde cada afirmação está no MVP: [`docs/12-pitch-90s.md`](docs/12-pitch-90s.md)
 
 | Área | Rotas | Spec |
 |---|---|---|
