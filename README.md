@@ -18,16 +18,20 @@
 | Resumo de uma página para os avaliadores | [`docs/Growlithe-resumo-avaliadores.pdf`](docs/Growlithe-resumo-avaliadores.pdf) · [versão em texto](docs/RESUMO-AVALIADORES.md) |
 | Vídeo de 90 segundos | entregue à parte pela equipe |
 
-### 📱 Experimente no celular
+### 📱 Guia rápido para os avaliadores (5 minutos, no seu celular)
 
-<img src="docs/screenshots/qr-experimente.png" width="160" alt="QR Code de teste do check-in na Entrada principal" align="right">
+**Missão:** complete a *Caça ao tesouro do avaliador*: escaneie o QR 1 e depois o QR 2. Pontos em dobro!
 
-1. Aponte a câmera do celular para o QR ao lado (é o check-in da "Entrada principal", vale 20 pontos).
-2. Informe seu e-mail e toque no link que chegar — sem senha e sem instalar nada.
-3. Diga seu nome e veja os pontos, o nível e as missões em `/app`.
+| QR 1 · Entrada (check-in) | QR 2 · Praça de alimentação |
+|---|---|
+| <img src="docs/screenshots/qr-1-entrada.png" width="170" alt="QR 1: check-in na Entrada"> | <img src="docs/screenshots/qr-2-praca.png" width="170" alt="QR 2: Praça de alimentação"> |
 
-Cada e-mail pontua uma vez por dia neste ponto (antifraude). Para ver a landing, o teste A/B e a lista de espera, basta abrir **https://growlithe-flax.vercel.app**.
-<br clear="right">
+1. **Escaneie o QR 1** com a câmera do celular e toque em **"Entrar como avaliador"** — sem e-mail, sem senha, sem instalar nada. Você ganha os pontos do check-in e vê *"Caça ao tesouro: 1 de 2"*.
+2. **Escaneie o QR 2.** A missão fica concluída e os pontos vêm **em dobro** (Missão Relâmpago). Toque em *Ver minhas missões* para ver nível, saldo e presença no shopping.
+3. **Veja o lado do shopping:** abra **https://growlithe-flax.vercel.app/painel** no mesmo celular. Como avaliador você entra como **admin**: veja o **Dashboard** (o seu scan já aparece), crie uma missão em **Missões** e imprima QR Codes em **Checkpoints**.
+4. **Bônus:** `/?easter=noite` e `/?easter=chuva` mostram o easter egg de sexta-feira 13; o botão ☀️/🌙 troca o tema.
+
+O acesso de avaliador vale até **15/11 às 23h59** e depois expira sozinho. Cada conta pontua uma vez por dia em cada ponto (antifraude).
 
 ---
 
@@ -235,11 +239,12 @@ Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), 
 | Painel do shopping (admin e lojista) | `/painel`, `/painel/checkpoints`, `/painel/missoes`, `/painel/validar`, `/painel/dashboard` | [003](docs/specs/003-painel-admin.md) |
 | Easter egg de sexta-feira 13 (madrugada e chuva) | `/?easter=noite`, `/?easter=chuva` | [006](docs/specs/006-easter-egg-sexta-13.md) |
 | Botão de tema claro / escuro | todas as páginas com cabeçalho | [007](docs/specs/007-escolha-de-tema.md) |
+| Modo avaliador: entrar sem e-mail e ver o painel (até 15/11) | botão no scan, em `/app/entrar` e em `/painel/login` | [008](docs/specs/008-modo-avaliador.md) |
 | Missão Relâmpago por cupom fiscal (NFC-e) | — planejada | [001](docs/specs/001-missao-relampago.md) |
 
 **Segurança:** o QR do checkpoint é assinado e conferido **dentro do banco** (o segredo nunca sai de lá); pontos só mudam por funções transacionais; RLS em todas as tabelas; do visitante, o painel só vê primeiro nome e nível (LGPD).
 
-**Qualidade:** TypeScript strict sem `any`/`as`, 188 testes Vitest, testes de banco (RLS e regras) num Postgres temporário, CI em todo PR (tipos, lint, testes, build e banco).
+**Qualidade:** TypeScript strict sem `any`/`as`, 193 testes Vitest, testes de banco (RLS e regras) num Postgres temporário, CI em todo PR (tipos, lint, testes, build e banco).
 
 ### Como rodar
 
@@ -281,7 +286,7 @@ growlithe/
 ├── docs/
 │   ├── 01–10                     # planejamento da Entrega 1 (telas, visão, dados, arquitetura, stack…)
 │   ├── 11-plano-entrega-final.md # prazos de 14/11, critérios e ordem de entrega
-│   ├── specs/                    # 000-template · 001 a 004 · 006 · 007
+│   ├── specs/                    # 000-template · 001 a 004 · 006 a 008
 │   └── wireframes/               # telas em PNG, tema escuro e claro
 ├── src/
 │   ├── app/                      # rotas Next.js: landing, /app, /s/<token>, /painel, /auth
@@ -294,7 +299,7 @@ growlithe/
 │   ├── ui/                       # temas e botão de tema
 │   └── middleware.ts             # sessão do Supabase, variante A/B e contagem de visitas
 ├── supabase/
-│   ├── migrations/               # 6 migrations, com as mesmas versões do projeto Supabase
+│   ├── migrations/               # 7 migrations, com as mesmas versões do projeto Supabase
 │   ├── seed.sql                  # lojas, checkpoints e recompensas de demonstração
 │   └── tests/                    # testes de banco num Postgres temporário
 ├── .github/
