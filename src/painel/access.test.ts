@@ -72,4 +72,17 @@ describe("safeNextPath: para onde voltar depois do link mágico", () => {
       expect(safeNextPath(bad)).toBe("/painel");
     }
   });
+
+  it("spec 004: aceita o app do visitante e a volta para o scan", () => {
+    expect(safeNextPath("/app")).toBe("/app");
+    expect(safeNextPath("/app/missoes")).toBe("/app/missoes");
+    expect(safeNextPath("/app/nome?next=/s/abc")).toBe("/painel");
+    expect(safeNextPath("/s/eyJ2IjoxLCJjcCI6_-x")).toBe("/s/eyJ2IjoxLCJjcCI6_-x");
+  });
+
+  it("spec 004: recusa variações perigosas do app e do scan", () => {
+    for (const bad of ["/appx", "/s/", "/s/a/b", "/s/a b", "//app", "/s/%2F%2Fevil"]) {
+      expect(safeNextPath(bad)).toBe("/painel");
+    }
+  });
 });

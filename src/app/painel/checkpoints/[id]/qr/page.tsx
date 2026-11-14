@@ -3,11 +3,10 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
 import { ArrowLeft, Flame } from "lucide-react";
+import { z } from "zod";
 import { CheckpointId, CheckpointRow } from "@/domain/schemas";
 import { requireStaffRole } from "@/painel/access";
 import { checkpointScanUrl, printedQrExpiry } from "@/painel/checkpoints";
-import { qrSigningSecret } from "@/server/env";
-import { signQrToken } from "@/server/qr-token";
 import { getPainelAccess } from "@/server/staff";
 import { createSupabaseServerClient } from "@/server/supabase";
 import { NoAccess } from "../../../no-access";
@@ -15,7 +14,10 @@ import { PrintButton } from "./print-button";
 
 export const metadata: Metadata = { title: "QR do checkpoint · Painel Growlithe" };
 
-/** UC7 / critério 13: QR assinado no servidor; o segredo nunca chega ao navegador. */
+/**
+ * UC7 / critério 13: o banco assina o QR (`sign_checkpoint_qr`, spec 004 D16).
+ * O segredo só existe no banco: nem o navegador nem o servidor do app o veem.
+ */
 export default async function CheckpointQrPage({ params }: { params: Promise<{ id: string }> }) {
   const access = await getPainelAccess();
   if (access.kind === "anonymous") redirect("/painel/login");
@@ -25,19 +27,23 @@ export default async function CheckpointQrPage({ params }: { params: Promise<{ i
   if (!id.success) notFound();
 
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from("checkpoints")
-    .select("id, store_id, label, dynamic_qr, active")
-    .eq("id", id.data)
-    .maybeSingle();
+  const [{ data }, signed] = await Promise.all([
+    supabase
+      .from("checkpoints")
+      .select("id, store_id, label, dynamic_qr, active")
+      .eq("id", id.data)
+      .maybeSingle(),
+    supabase.rpc("sign_checkpoint_qr", { p_checkpoint: id.data }),
+  ]);
   const checkpoint = CheckpointRow.safeParse(data);
-  if (!checkpoint.success) notFound();
+  const token = z.string().regex(/^[A-Za-z0-9_-]+$/).safeParse(signed.data);
+  if (!checkpoint.success || !token.success) notFound();
 
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host") ?? "localhost:3000"}`;
-  const now = new Date();
-  const exp = printedQrExpiry(now);
-  const url = checkpointScanUrl(origin, signQrToken(checkpoint.data.id, exp, qrSigningSecret()));
+  // O banco assina com validade de 1 ano; a data abaixo só informa quando reimprimir.
+  const exp = printedQrExpiry(new Date());
+  const url = checkpointScanUrl(origin, token.data);
   // Preto no branco e margem larga: lê bem impresso e em qualquer câmera, nos dois temas.
   const svg = await QRCode.toString(url, { type: "svg", errorCorrectionLevel: "M", margin: 4, color: { dark: "#000000", light: "#FFFFFF" } });
   const validUntil = new Date(exp * 1000).toLocaleDateString("pt-BR");

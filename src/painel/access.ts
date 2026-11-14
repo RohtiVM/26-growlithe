@@ -55,6 +55,12 @@ export const requireStaffRole = (
   }
 };
 
-/** Destino depois do link mágico: só caminhos internos do painel (evita redirecionamento aberto). */
+/**
+ * Destino depois do link mágico: só caminhos internos conhecidos (evita
+ * redirecionamento aberto). Painel, app do visitante e a volta para o scan
+ * (`/s/<token>`, spec 004 D1).
+ */
+const SAFE_NEXT = [/^\/painel(\/[A-Za-z0-9/_-]*)?$/, /^\/app(\/[A-Za-z0-9_-]+)*$/, /^\/s\/[A-Za-z0-9_-]+$/] as const;
+
 export const safeNextPath = (next: string | null): string =>
-  next !== null && /^\/painel(\/[A-Za-z0-9/_-]*)?$/.test(next) ? next : "/painel";
+  next !== null && SAFE_NEXT.some((re) => re.test(next)) ? next : "/painel";

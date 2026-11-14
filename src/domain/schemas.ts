@@ -1086,3 +1086,48 @@ export const WAITLIST_OUTCOME_MESSAGES = {
 } as const satisfies Record<WaitlistOutcome, string>;
 
 export const WAITLIST_SAVE_FAILED_MESSAGE = "Não conseguimos salvar agora. Tente de novo em instantes.";
+
+/* ------------------------------------------------------------------ */
+/* 15. Scan do visitante (spec 004)                                    */
+/* ------------------------------------------------------------------ */
+
+const Count15 = z.number().int().nonnegative();
+
+/** Missão tocada por um scan, como `scan_checkpoint` devolve. */
+export const ScanMissionRow = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("completed"), title: z.string(), current: Count15, target: Count15, points: z.number().int().positive() }),
+  z.object({ status: z.literal("progress"), title: z.string(), current: Count15, target: Count15 }),
+  z.object({
+    status: z.literal("out_of_order"),
+    title: z.string(),
+    current: Count15,
+    target: Count15,
+    expected: z.number().int().positive(),
+    scanned: z.number().int().positive().nullable(),
+  }),
+]);
+export type ScanMissionRow = z.infer<typeof ScanMissionRow>;
+
+/** Resposta de `public.scan_checkpoint(token)`. */
+export const ScanCheckpointRow = z.discriminatedUnion("result", [
+  z.object({
+    result: z.literal("ok"),
+    checkpoint: z.string(),
+    is_checkin: z.boolean(),
+    base_points: z.number().int().positive(),
+    points_earned: z.number().int().positive(),
+    points_balance: Count15,
+    lifetime_before: Count15,
+    lifetime_after: Count15,
+    missions: z.array(ScanMissionRow),
+  }),
+  z.object({ result: z.literal("already_scanned_today"), checkpoint: z.string() }),
+  z.object({ result: z.enum(["invalid_qr", "expired_qr", "not_authenticated"]) }),
+]);
+export type ScanCheckpointRow = z.infer<typeof ScanCheckpointRow>;
+
+/** Nome pedido uma vez, logo após o primeiro login (D13). */
+export const VisitorNameInput = z.object({
+  name: z.string().trim().min(2, "Conta pra gente como podemos te chamar").max(80, "Use até 80 caracteres"),
+});
+export type VisitorNameInput = z.infer<typeof VisitorNameInput>;

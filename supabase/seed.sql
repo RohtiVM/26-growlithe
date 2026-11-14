@@ -7,11 +7,11 @@ insert into public.stores (id, name, cnpj, category) values
   ('a1000000-0000-4000-8000-000000000003', 'Livraria Palmas', '33444555000163', 'livraria')
 on conflict (id) do nothing;
 
-insert into public.checkpoints (id, store_id, label) values
-  ('c1000000-0000-4000-8000-000000000001', null, 'Entrada principal'),
-  ('c1000000-0000-4000-8000-000000000002', null, 'Praça de alimentação'),
-  ('c1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000001', 'Moda Cerrado — vitrine'),
-  ('c1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000003', 'Livraria Palmas — balcão')
+insert into public.checkpoints (id, store_id, label, is_entrance) values
+  ('c1000000-0000-4000-8000-000000000001', null, 'Entrada principal', true),
+  ('c1000000-0000-4000-8000-000000000002', null, 'Praça de alimentação', false),
+  ('c1000000-0000-4000-8000-000000000003', 'a1000000-0000-4000-8000-000000000001', 'Moda Cerrado — vitrine', false),
+  ('c1000000-0000-4000-8000-000000000004', 'a1000000-0000-4000-8000-000000000003', 'Livraria Palmas — balcão', false)
 on conflict (id) do nothing;
 
 insert into public.rewards (id, title, cost_points, benefit, stock, min_tier) values
