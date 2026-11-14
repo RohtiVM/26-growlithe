@@ -724,3 +724,46 @@ export type DashboardMetrics = z.infer<typeof DashboardMetrics>;
 /** Conversão da landing (leads ÷ visitas); `null` quando ainda não há visitas. */
 export const conversionRate = ({ visits, leads }: VariantFunnel): number | null =>
   visits === 0 ? null : leads / visits;
+
+/** Linha de `public.profiles` lida pelo painel (banco → domínio, sem `as`). */
+export const StaffProfileRow = z
+  .object({
+    id: UserId,
+    staff_role: StaffRole.nullable(),
+    store_id: StoreId.nullable(),
+  })
+  .transform((row, ctx): StaffMember | null => {
+    switch (row.staff_role) {
+      case null:
+        return null;
+      case "admin":
+        return { role: "admin", userId: row.id };
+      case "lojista":
+        if (row.store_id === null) {
+          ctx.addIssue({ code: "custom", message: "Lojista sem loja" });
+          return z.NEVER;
+        }
+        return { role: "lojista", userId: row.id, storeId: row.store_id };
+      default:
+        return assertNever(row.staff_role);
+    }
+  });
+
+/** Quem está diante do painel. `no_access` cobre perfil sem papel e linha inválida. */
+export type PainelAccess =
+  | { kind: "anonymous" }
+  | { kind: "no_access" }
+  | { kind: "staff"; staff: StaffMember };
+
+export const PAINEL_AUTH_ERRORS = ["not_authenticated", "forbidden"] as const;
+export type PainelAuthError = (typeof PAINEL_AUTH_ERRORS)[number];
+
+export const PAINEL_AUTH_MESSAGES = {
+  not_authenticated: "Entre com o seu e-mail para usar o painel.",
+  forbidden: "Você não tem permissão para fazer isso. Fale com o marketing do shopping.",
+} as const satisfies Record<PainelAuthError, string>;
+
+export const SendMagicLinkInput = z.object({
+  email: z.email("Confira o e-mail"),
+});
+export type SendMagicLinkInput = z.infer<typeof SendMagicLinkInput>;
