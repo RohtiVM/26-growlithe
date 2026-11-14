@@ -1,6 +1,6 @@
 # Growlithe — Time 26
 
-**Missões que fazem você voltar ao shopping.** · MVP no ar: **growlithe-flax.vercel.app** · Código: **github.com/RohtiVM/26-growlithe** · **Experimente:** escaneie o QR (check-in de teste, entra só com o e-mail).
+**Missões que fazem você voltar ao shopping.** · MVP no ar: **growlithe-flax.vercel.app** · Código: **github.com/RohtiVM/26-growlithe** · **Experimente:** escaneie o QR 1 e depois o QR 2, toque em *Entrar como avaliador* (sem e-mail) e abra `/painel` para ver o lado do shopping.
 
 **1. Nome do projeto.** Growlithe: web app gamificado de engajamento e fidelização para o Shopping Capim Dourado (Palmas, TO).
 
@@ -16,7 +16,7 @@
 - **Landing page (prática sorteada):** apresenta o produto aos três públicos, teste A/B de manchete e lista de espera que mede a conversão de cada variante.
 - **Easter egg de sexta-feira 13:** de madrugada o mascote aparece dormindo; com chuva forte em Palmas, gotas escorrem pela tela e o app destaca lojas de guarda-chuva e bebidas quentes.
 
-**6. Tecnologias utilizadas.** TypeScript (strict) · React 19 com Next.js 15 · Supabase (PostgreSQL, autenticação e regras de acesso por linha) · Zod para validar toda entrada · Vercel (hospedagem, funções em São Paulo) · GitHub Actions (tipos, lint, 188 testes, testes de banco e build em todo PR) · Open-Meteo (clima) · desenvolvimento orientado a especificação (spec → tickets → testes primeiro → revisão), com 6 specs e 18 pull requests aprovados pelo CI.
+**6. Tecnologias utilizadas.** TypeScript (strict) · React 19 com Next.js 15 · Supabase (PostgreSQL, autenticação e regras de acesso por linha) · Zod para validar toda entrada · Vercel (hospedagem, funções em São Paulo) · GitHub Actions (tipos, lint, 193 testes, testes de banco e build em todo PR) · Open-Meteo (clima) · desenvolvimento orientado a especificação (spec → tickets → testes primeiro → revisão), com 7 specs e 18 pull requests aprovados pelo CI.
 
 **7. Diferencial e inovação.** Zero instalação: a câmera nativa do celular já abre o app. **QR Code à prova de fraude:** cada código é assinado e conferido dentro do banco; um mesmo ponto só pontua uma vez por dia, mesmo com requisições simultâneas. Recompensa **comportamento** (circular, voltar, ir a eventos), não só gasto. Para o shopping, cada scan vira dado de circulação que ele hoje não tem. Privacidade desde o início (LGPD): o lojista só vê o primeiro nome e o nível do visitante.
 
