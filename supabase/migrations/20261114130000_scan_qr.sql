@@ -115,7 +115,8 @@ declare
   v_cp text;
   v_exp text;
 begin
-  if p_token is null or p_token !~ '^[A-Za-z0-9_-]{20,600}$' then
+  -- Tamanho conferido à parte: o Postgres limita repetições de regex a 255.
+  if p_token is null or length(p_token) not between 20 and 600 or p_token !~ '^[A-Za-z0-9_-]+$' then
     return jsonb_build_object('result', 'invalid_qr');
   end if;
 
