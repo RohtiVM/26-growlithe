@@ -1,6 +1,6 @@
 # Spec 003 · Painel do shopping (admin e lojista)
 
-> Formato de saída do `/to-spec`. Status: **aprovada para implementação** · Origem: sessão de grill de 13/11 com o time (decisões D1–D8). Telas de referência: `docs/01-telas-e-fluxos.md` (A1–A5).
+> Formato de saída do `/to-spec`. Status: **em implementação** (T1, T2 e T4 prontos) · Origem: sessão de grill de 13/11 com o time (decisões D1–D8). Telas de referência: `docs/01-telas-e-fluxos.md` (A1–A5).
 
 ## Problema
 
@@ -272,14 +272,14 @@ Formato: **Dado** / **Quando** / **Então**. Cada critério vira pelo menos um t
 
 ## Tickets (`/to-tickets`)
 
-| # | Ticket | Depende de |
-|---|---|---|
-| T1 | Schemas `StaffRole`, `StaffMember`, `Checkpoint`, `CreateCheckpointInput`, `DashboardMetrics` + testes | — |
-| T2 | Banco: `staff_role` e `store_id` em `profiles`, tabela `checkpoints`, RLS, seed (lojas, recompensas, 1 admin, 1 lojista) | — |
-| T3 | Login por link mágico + guarda do `/painel` por papel (critérios 1–3) | T1, T2 |
-| T4 | Assinatura e verificação HMAC do `QrPayload` + testes (critério 14) | T1 |
-| T5 | Checkpoints: cadastrar, listar e imprimir QR (critério 13) | T3, T4 |
-| T6 | Missões: formulário A3, lista agrupada e encerrar (critérios 8–12) | T3 |
-| T7 | Função Postgres `validate_redemption` (atômica, com `validated_by`) + Server Action (critérios 15–19) | T2 |
-| T8 | Tela A5 de validar cupom de resgate, responsiva | T3, T7 |
-| T9 | Consultas e tela do dashboard (critérios 4–7) | T3; leads dependem da spec 002 T3 |
+| # | Ticket | Depende de | Issue | Status |
+|---|---|---|---|---|
+| T1 | Schemas `StaffRole`, `StaffMember`, `Checkpoint`, `CreateCheckpointInput`, `DashboardMetrics` + testes | — | #3 | ✅ |
+| T2 | Banco: `staff_role` e `store_id` em `profiles`, tabela `checkpoints`, RLS, seed (lojas, recompensas, 1 admin, 1 lojista) | — | #4 | ✅ (falta aplicar no Supabase) |
+| T3 | Login por link mágico + guarda do `/painel` por papel (critérios 1–3) | T1, T2 | #5 | ⬜ |
+| T4 | Assinatura e verificação HMAC do `QrPayload` + testes (critério 14) | T1 | #6 | ✅ |
+| T5 | Checkpoints: cadastrar, listar e imprimir QR (critério 13) | T3, T4 | #7 | ⬜ |
+| T6 | Missões: formulário A3, lista agrupada e encerrar (critérios 8–12) | T3 | #8 | ⬜ |
+| T7 | Função Postgres `validate_redemption` (atômica, com `validated_by`) + Server Action (critérios 15–19) | T2 | #9 | ⬜ |
+| T8 | Tela A5 de validar cupom de resgate, responsiva | T3, T7 | #10 | ⬜ |
+| T9 | Consultas e tela do dashboard (critérios 4–7) | T3; leads dependem da spec 002 T3 | #11 | ⬜ |

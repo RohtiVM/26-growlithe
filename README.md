@@ -196,23 +196,44 @@ growlithe/
 │   ├── 09-integracao-sefaz.md
 │   ├── 10-processo-de-desenvolvimento.md
 │   ├── 11-plano-entrega-final.md # prazos de 14/11, critérios e ordem de entrega
-│   ├── specs/                    # 000-template · 001-missao-relampago · 002-landing-page
+│   ├── specs/                    # 000-template · 001-missao-relampago · 002-landing-page · 003-painel-admin
 │   └── wireframes/               # telas em PNG, tema escuro e claro
 ├── src/
-│   ├── domain/schemas.ts         # modelo de domínio (Zod), compila em strict
+│   ├── app/                      # Next.js: layout com os temas + landing page (rota /)
+│   ├── middleware.ts             # teste A/B: fixa a variante da manchete por cookie
+│   ├── landing/ab-test.ts        # manchetes A/B e sorteio
+│   ├── domain/schemas.ts         # modelo de domínio (Zod), inclui papéis e checkpoints do painel
 │   ├── domain/schemas.type-test.ts
+│   ├── server/qr-token.ts        # assina e verifica o QR do checkpoint (HMAC)
 │   ├── server/receipt-verifier.ts# cupom fiscal: SEFAZ + fallback local
 │   └── ui/theme.ts               # temas escuro e claro
-├── .github/workflows/ci.yml      # typecheck, lint, testes e build em todo PR
-├── package.json · tsconfig.json · .env.example
+├── supabase/
+│   ├── migrations/               # tabelas, papéis e RLS do painel
+│   ├── seed.sql                  # lojas, checkpoints e recompensas de demonstração
+│   └── tests/                    # testes de banco (RLS) num Postgres temporário
+├── .github/
+│   ├── workflows/ci.yml          # tipos, lint, testes, build e banco em todo PR
+│   └── pull_request_template.md  # PR exige spec, ticket e critérios de aceite
+├── package.json · tsconfig.json · eslint.config.mjs · vitest.config.ts · .env.example
 ```
 
-## Próximos passos (rumo ao MVP)
+## Status (13/11, noite)
 
 > Prazo: **MVP rodando em 14/11 às 12h** e **pitch de 90s às 13h**. Ordem de entrega e critérios em [`docs/11-plano-entrega-final.md`](docs/11-plano-entrega-final.md). Toda feature passa pelo fluxo spec-driven ([`CLAUDE.md`](CLAUDE.md)).
 
-1. Criar o projeto React/Next.js e conectar o Supabase.
-2. Implementar check-in e missões por QR Code (assinatura HMAC + pontos no banco).
-3. Implementar a Missão Relâmpago com o cupom fiscal (spec 001).
-4. Publicar a landing page com o teste A/B e as métricas.
-5. Painel do shopping: criar missões e validar cupons de resgate.
+**Pronto na `main`:**
+- ✅ Projeto Next.js 15 + React 19 com TypeScript strict, Zod, Vitest, ESLint e CI verde.
+- ✅ Landing page na rota `/` com os dois temas e teste A/B de manchete (spec 002, T1–T2).
+- ✅ Spec 003 do painel: casos de uso, diagrama de classes, requisitos funcionais e não funcionais, critérios de aceite e 9 issues (#3–#11).
+- ✅ Painel T1 (#3): schemas de papel, checkpoint, métricas e regra de validação do cupom de resgate.
+- ✅ Painel T2 (#4): migration com tabelas, papéis, RLS e seed, com testes de banco no CI.
+- ✅ Painel T4 (#6): assinatura e verificação HMAC do QR do checkpoint.
+
+**Próximos passos:**
+1. Aplicar a migration e o seed no projeto Supabase e promover o primeiro admin (`private.grant_staff`).
+2. Conectar o repositório à Vercel (deploy e preview por PR).
+3. Painel T3 (#5): login por link mágico e acesso ao `/painel` por papel.
+4. Painel T5 (#7): cadastrar checkpoints e imprimir os QR Codes.
+5. Spec 004: check-in e missão por QR (scan, pontos e Home do visitante).
+6. Spec 002, T3–T5: formulário da lista de espera gravando leads.
+7. Painel T6–T9, resgate (spec 005) e Missão Relâmpago (spec 001), se houver tempo.
