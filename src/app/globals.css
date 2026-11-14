@@ -38,9 +38,13 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="claro"]) {
     --color-danger: #ff7a66;
   }
+}
+
+:root[data-theme="escuro"] {
+  --color-danger: #ff7a66;
 }
 
 html {
@@ -2092,5 +2096,43 @@ textarea {
   .dash-bar-track {
     grid-column: 1 / -1;
     grid-row: 2;
+  }
+}
+
+/* Botão de tema (spec 007): troca instantânea, sem animar as cores. */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), background-color 150ms ease;
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle:hover {
+    background: var(--color-surfaceAlt);
+  }
+}
+
+.v-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Painel no celular: tema, papel e Sair não cabem juntos ao lado da marca. */
+@media (max-width: 479px) {
+  .role-chip {
+    display: none;
   }
 }
