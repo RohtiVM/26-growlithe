@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import type { ReactNode } from "react";
 import { themeCss } from "@/ui/theme";
+import { THEME_BOOT_SCRIPT } from "@/ui/theme-preference";
 import "./globals.css";
 
 /** docs/01: títulos em Space Grotesk, textos em Inter. Servidas pelo próprio app (sem CLS, sem Google no navegador). */
@@ -24,16 +25,22 @@ export const viewport: Viewport = {
   ],
 };
 
-/** O app segue o modo do celular: escuro (vermelho) ou claro (Tocantins). */
+/**
+ * Tema: claro (Tocantins) ou escuro (vermelho). Sem escolha, segue o celular;
+ * o botão sol/lua grava `data-theme` no <html> e ele vence (spec 007).
+ */
 const themeStyles = `
 :root { ${themeCss("claro")} color-scheme: light; }
-@media (prefers-color-scheme: dark) { :root { ${themeCss("escuro")} color-scheme: dark; } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="claro"]) { ${themeCss("escuro")} color-scheme: dark; } }
+:root[data-theme="escuro"] { ${themeCss("escuro")} color-scheme: dark; }
 `;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${body.variable}`}>
+    // suppressHydrationWarning: o script abaixo pode pôr `data-theme` antes de o React hidratar.
+    <html lang="pt-BR" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         <style>{themeStyles}</style>
       </head>
       <body>{children}</body>

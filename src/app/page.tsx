@@ -9,6 +9,7 @@ import { RainCard, RainLayer } from "@/easter/rain";
 import { SleepingMascot } from "@/easter/sleeping-mascot";
 import { parseEasterOverride } from "@/easter/egg";
 import { getEasterEgg } from "@/easter/weather";
+import { ThemeToggle } from "@/ui/theme-toggle";
 
 const TIER_INFO = {
   bronze: { label: "Bronze", initial: "B", perk: "Café e descontos em lanchonetes" },
@@ -75,6 +76,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
             <a className="nav-link" href="#como-funciona">Como funciona</a>
             <a className="nav-link" href="#premios">Prêmios</a>
             <a className="nav-link" href="#lojistas">Para lojistas</a>
+            <ThemeToggle />
             <a className="btn btn-sm" href="#lista-de-espera">Entrar na lista</a>
           </div>
         </nav>

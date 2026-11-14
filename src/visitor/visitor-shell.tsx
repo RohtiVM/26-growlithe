@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Flame, Home, ScanLine, Target } from "lucide-react";
+import { ThemeToggle } from "@/ui/theme-toggle";
 
 type Tab = "inicio" | "missoes" | "none";
 
@@ -11,7 +12,10 @@ export function VisitorShell({ children, points, tab }: { children: ReactNode; p
         <a className="brand" href="/app">
           <Flame size={20} aria-hidden /> Growlithe
         </a>
-        {points !== undefined && <span className="v-points tabular">{points.toLocaleString("pt-BR")} pts</span>}
+        <div className="v-top-actions">
+          {points !== undefined && <span className="v-points tabular">{points.toLocaleString("pt-BR")} pts</span>}
+          <ThemeToggle />
+        </div>
       </header>
       <main className="v-main">{children}</main>
       <nav className="v-tabs" aria-label="App">
