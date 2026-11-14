@@ -233,12 +233,12 @@ growlithe/
 
 ### Onde paramos (retomar daqui)
 
-Estado em **14/11, madrugada**: tudo na `main`, CI verde, banco Supabase com as 5 migrations aplicadas.
+Estado em **14/11, madrugada**: tudo na `main`, CI verde, banco Supabase com as 6 migrations aplicadas (mesmas versões do repositório).
 
 **Pronto:**
 - Landing com teste A/B, **lista de espera gravando leads** (spec 002) e passada de design (Impeccable).
 - **App do visitante (spec 004):** `/s/<token>` (escaneou → pontos), `/app` (nível, saldo, presença, missões) e `/app/missoes`. O QR é assinado e conferido **dentro do banco** (o segredo nunca sai de lá).
-- **Painel (spec 003):** login por papel, checkpoints e QR, **missões** (criar, listar, encerrar) e **validar cupom de resgate**.
+- **Painel (spec 003):** login por papel, checkpoints e QR, **missões** (criar, listar, encerrar), **validar cupom de resgate** e **dashboard** (check-ins, visitantes, scans por checkpoint, missões, resgates e conversão do A/B).
 - **Easter egg de sexta-feira 13 (spec 006):** mascote dormindo de 00h às 06h e chuva forte em Palmas. Na demo: `?easter=noite` e `?easter=chuva`.
 
 **Roteiro da manhã (antes do pitch):**
@@ -251,6 +251,9 @@ Estado em **14/11, madrugada**: tudo na `main`, CI verde, banco Supabase com as 
 
 **Decisões tomadas de madrugada, para revisar (⚠️ nas specs):** spec 004 D9–D15 (pontos base 10/20, caça ao tesouro fora de ordem, missão completa 1 vez, multiplicador relâmpago, nome no primeiro login, endereços, celebração de nível) e spec 006 D3–D7 (mascote original, Open-Meteo, limiar de chuva, card no lugar do mapa, `?easter=`).
 
-**Pendente:** lista de e-mails de admin automática (falta saber os e-mails do time) e dashboard do painel (T9).
+**Pendente:** lista de e-mails de admin automática (falta saber os e-mails do time).
+
+**Dados de teste no banco (limpar antes do pitch, se quiser números zerados no dashboard):** 1 lead do QA (`qa-growlithe@example.com`) e 3 visitas de teste da landing. No SQL Editor:
+`delete from public.landing_leads where email = 'qa-growlithe@example.com'; delete from public.landing_visits;`
 
 **Em outro computador:** `git clone`, `pnpm install` e criar o `.env.local` com `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (chave *publishable* em *Project Settings → API keys*).
