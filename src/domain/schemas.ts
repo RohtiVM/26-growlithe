@@ -767,3 +767,32 @@ export const SendMagicLinkInput = z.object({
   email: z.email("Confira o e-mail"),
 });
 export type SendMagicLinkInput = z.infer<typeof SendMagicLinkInput>;
+
+/* ------------------------------------------------------------------ */
+/* 11. Checkpoints no painel (spec 003, ticket T5)                     */
+/* ------------------------------------------------------------------ */
+
+/** Linha de `public.checkpoints` → domínio. Validada na borda, sem `as`. */
+export const CheckpointRow = z
+  .object({
+    id: CheckpointId,
+    store_id: StoreId.nullable(),
+    label: z.string(),
+    dynamic_qr: z.boolean(),
+    active: z.boolean(),
+  })
+  .transform((r): Checkpoint => ({
+    id: r.id,
+    storeId: r.store_id,
+    label: r.label,
+    dynamicQr: r.dynamic_qr,
+    active: r.active,
+  }));
+
+export const CHECKPOINT_ERRORS = ["duplicate_label", "save_failed"] as const;
+export type CheckpointError = (typeof CHECKPOINT_ERRORS)[number];
+
+export const CHECKPOINT_ERROR_MESSAGES = {
+  duplicate_label: "Já existe um ponto com esse nome neste local. Use outro nome, como \"Entrada Norte\".",
+  save_failed: "Não conseguimos salvar agora. Tente de novo em instantes.",
+} as const satisfies Record<CheckpointError, string>;

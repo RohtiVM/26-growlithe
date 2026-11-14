@@ -215,3 +215,69 @@ button.btn {
   color: inherit;
   border-color: var(--color-primary);
 }
+
+.form select {
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.list-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.list-item p {
+  margin: 4px 0 0;
+}
+
+.qr-sheet {
+  text-align: center;
+}
+
+.qr-code {
+  width: min(320px, 100%);
+  margin: 24px auto;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.qr-code svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.qr-sheet .actions {
+  justify-content: center;
+}
+
+@media print {
+  .no-print {
+    display: none;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .qr-sheet .muted {
+    color: #333333;
+  }
+}

@@ -10,7 +10,6 @@ export const metadata: Metadata = { title: "Painel · Growlithe" };
 const SECTIONS = [
   { title: "Dashboard", text: "Check-ins, scans por checkpoint, resgates e leads da landing.", ticket: "T9" },
   { title: "Missões", text: "Criar missões e lançar Missão Relâmpago.", ticket: "T6" },
-  { title: "Checkpoints e QR", text: "Cadastrar pontos físicos e imprimir os QR Codes.", ticket: "T5" },
 ] as const;
 
 export default async function PainelPage() {
@@ -29,6 +28,10 @@ export default async function PainelPage() {
           <a className="card card-link" href="/painel/validar">
             <h3>Validar cupom de resgate</h3>
             <p>Digite os 6 dígitos que o visitante mostrar.</p>
+          </a>
+          <a className="card card-link" href="/painel/checkpoints">
+            <h3>Checkpoints e QR</h3>
+            <p>Cadastrar pontos físicos e imprimir os QR Codes.</p>
           </a>
           {SECTIONS.map((s) => (
             <article className="card" key={s.title}>
