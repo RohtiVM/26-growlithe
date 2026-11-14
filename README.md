@@ -3,7 +3,9 @@
 > **Integrantes:** Bruno Reis Mendes · Jhuan Pablo Noleto Cardoso · Ricardo Silva Freitas · Vithor Borges Ferreira Moura
 >
 > **Missões que fazem você voltar ao shopping.**
-> Hackathon · Desafio **05. Engajamento e fidelização dos visitantes** · **Entrega 1: planejamento técnico inicial** (13/11, até 12h)
+> Hackathon · Desafio **05. Engajamento e fidelização dos visitantes** · Shopping Capim Dourado, Palmas (TO)
+>
+> 🌐 **MVP no ar: https://growlithe-flax.vercel.app** · Entrega 1 (planejamento, 13/11) · MVP final (14/11)
 
 ---
 
@@ -131,6 +133,8 @@ flowchart TB
 
 Eixo sorteado: **Testes, métricas e lançamento → Landing page**.
 
+**Onde está:** é a página inicial do site, **https://growlithe-flax.vercel.app/** (código em `src/app/page.tsx`). O formulário grava os leads no banco com a variante do teste A/B e a origem (UTM), e o dashboard do painel mostra a conversão de cada variante.
+
 A landing page do Growlithe é o **primeiro experimento do produto**: ela responde com dados se as pessoas querem a solução.
 
 - **Três públicos, três chamadas:** visitante ("Entrar na lista de espera"), lojista ("Quero minha loja no Growlithe") e shopping ("Agendar demonstração"), todos no mesmo formulário com validação Zod e aceite da LGPD.
@@ -143,7 +147,26 @@ A landing page do Growlithe é o **primeiro experimento do produto**: ela respon
 
 ---
 
-## 6. Proposta e estrutura inicial das telas
+## 6. Telas
+
+### MVP publicado (capturas reais de https://growlithe-flax.vercel.app)
+
+| Landing · desktop, tema escuro | Landing · desktop, tema claro (Tocantins) |
+|---|---|
+| <img src="docs/screenshots/01-landing-desktop-escuro.jpeg" width="420" alt="Landing no desktop, tema escuro"> | <img src="docs/screenshots/02-landing-desktop-claro.jpeg" width="420" alt="Landing no desktop, tema claro"> |
+
+| Landing · celular, escuro | Landing · celular, claro | Easter egg: madrugada | Easter egg: chuva |
+|---|---|---|---|
+| <img src="docs/screenshots/03-landing-celular-escuro.jpeg" width="190" alt="Landing no celular, tema escuro"> | <img src="docs/screenshots/04-landing-celular-claro.jpeg" width="190" alt="Landing no celular, tema claro"> | <img src="docs/screenshots/05-easter-egg-madrugada.jpeg" width="190" alt="Mascote dormindo de madrugada"> | <img src="docs/screenshots/06-easter-egg-chuva.jpeg" width="190" alt="Efeito de chuva com destaque de lojas"> |
+
+| Escaneou um QR sem login | Login do painel |
+|---|---|
+| <img src="docs/screenshots/07-scan-entrar.jpeg" width="190" alt="Tela do scan pedindo o e-mail"> | <img src="docs/screenshots/08-painel-login.jpeg" width="190" alt="Login do painel do shopping"> |
+
+As telas internas (Home do visitante, resultado do scan e painel logado) exigem login; os wireframes abaixo mostram o desenho aprovado delas.
+
+<details>
+<summary><strong>Wireframes da Entrega 1 (planejamento, 13/11)</strong></summary>
 
 Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), nos dois temas. Há também o **protótipo navegável** em [canvas de design](https://claude.ai/artifact/8nLcM6mxjsQEm2uV5QB1ae). A estrutura é inicial e vai evoluir durante o hackathon.
 
@@ -177,85 +200,81 @@ Wireframes de alta fidelidade salvos em [`docs/wireframes/`](docs/wireframes/), 
 
 ---
 
+</details>
+
+## Estado do MVP (14/11)
+
+**No ar:** **https://growlithe-flax.vercel.app** — Vercel, funções em São Paulo (`gru1`), banco Supabase em São Paulo. Cada merge na `main` publica sozinho e cada PR ganha um link de prévia. O endereço `growlithe-rohti-vm.vercel.app` é protegido pela Vercel (pede login): **não use no pitch**.
+
+| Área | Rotas | Spec |
+|---|---|---|
+| Landing com teste A/B e lista de espera (prática sorteada) | `/` | [002](docs/specs/002-landing-page.md) |
+| App do visitante: escanear, ganhar pontos, nível, missões | `/s/<token>`, `/app`, `/app/missoes`, `/app/entrar` | [004](docs/specs/004-checkin-missao-qr.md) |
+| Painel do shopping (admin e lojista) | `/painel`, `/painel/checkpoints`, `/painel/missoes`, `/painel/validar`, `/painel/dashboard` | [003](docs/specs/003-painel-admin.md) |
+| Easter egg de sexta-feira 13 (madrugada e chuva) | `/?easter=noite`, `/?easter=chuva` | [006](docs/specs/006-easter-egg-sexta-13.md) |
+| Botão de tema claro / escuro | todas as páginas com cabeçalho | [007](docs/specs/007-escolha-de-tema.md) |
+| Missão Relâmpago por cupom fiscal (NFC-e) | — planejada | [001](docs/specs/001-missao-relampago.md) |
+
+**Segurança:** o QR do checkpoint é assinado e conferido **dentro do banco** (o segredo nunca sai de lá); pontos só mudam por funções transacionais; RLS em todas as tabelas; do visitante, o painel só vê primeiro nome e nível (LGPD).
+
+**Qualidade:** TypeScript strict sem `any`/`as`, 188 testes Vitest, testes de banco (RLS e regras) num Postgres temporário, CI em todo PR (tipos, lint, testes, build e banco).
+
+### Como rodar
+
+```bash
+pnpm install          # no Windows/PowerShell: pnpm.cmd
+pnpm dev              # http://localhost:3000
+pnpm typecheck && pnpm lint && pnpm test && pnpm build
+pnpm test:db          # migrations + RLS num Postgres temporário (precisa de Postgres 15+)
+```
+
+Crie o `.env.local` com `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (chave *publishable* em *Project Settings → API keys*). Não há segredo de QR no `.env`: ele vive no banco.
+
+### Roteiro da demo
+
+1. No painel (`/painel`, admin), **Checkpoints → Imprimir QR** da "Entrada principal" (check-in, 20 pts) — imprima a partir de `growlithe-flax.vercel.app` para o QR apontar para o site publicado. Crie uma **Missão Relâmpago** em **Missões**.
+2. No celular: escanear o QR → entrar com um e-mail → informar o nome → ver os pontos e a missão; abrir `/app`.
+3. No painel: **Dashboard** com check-ins, scans por checkpoint e conversão do A/B.
+4. Easter egg: `/?easter=noite` e `/?easter=chuva`.
+
+### Decisões para revisar
+
+Tomadas na madrugada de 14/11 e marcadas com ⚠️: spec 004 D9–D15 (pontos base 10/20, caça ao tesouro fora de ordem, missão completa uma vez, multiplicador relâmpago, nome no primeiro login, endereços, celebração de nível) e spec 006 D3–D7 (mascote original, Open-Meteo, limiar de chuva forte, card no lugar do mapa, `?easter=`).
+
+### Pendências conhecidas
+
+- Lista automática de e-mails de admin (hoje: `select private.grant_staff('<e-mail>', 'admin', null);` no SQL Editor).
+- Missão Relâmpago por cupom fiscal (spec 001) e resgate de recompensas pelo visitante (spec 005).
+- Dados de teste no banco (leads do QA e visitas de teste). Para zerar o dashboard antes do pitch:
+  `delete from public.landing_leads where email = 'qa-growlithe@example.com'; delete from public.landing_visits;`
+- Branch `backup/mvp-local-13-11`: cópia de 3 commits de 13/11 feitos neste computador e nunca integrados (MVP alternativo com PWA e push). Preservada para consulta; a `main` seguiu outra arquitetura.
+
 ## Estrutura do repositório
 
 ```
 growlithe/
-├── README.md                     # esta documentação inicial
-├── CONTEXT.md                    # glossário do domínio
-├── CLAUDE.md                     # regras do fluxo spec-driven para agentes
+├── README.md · CONTEXT.md (glossário) · CLAUDE.md (fluxo spec-driven)
 ├── docs/
-│   ├── 01-telas-e-fluxos.md      # mapa de telas, fluxos, wireframes em texto
-│   ├── 02-visao-do-produto.md    # problema, personas, escopo do MVP, métricas
-│   ├── 03-modelo-de-dados.md     # schemas Zod, tabelas, máquinas de estado
-│   ├── 04-linguagem.md           # por que TypeScript + React
-│   ├── 05-arquitetura.md         # diagramas e decisões
-│   ├── 06-stack.md               # plataforma e bibliotecas
-│   ├── 07-pratica-sorteada-landing-page.md
-│   ├── 08-qr-code-e-gamificacao.md
-│   ├── 09-integracao-sefaz.md
-│   ├── 10-processo-de-desenvolvimento.md
+│   ├── 01–10                     # planejamento da Entrega 1 (telas, visão, dados, arquitetura, stack…)
 │   ├── 11-plano-entrega-final.md # prazos de 14/11, critérios e ordem de entrega
-│   ├── specs/                    # 000-template · 001-missao-relampago · 002-landing-page · 003-painel-admin
+│   ├── specs/                    # 000-template · 001 a 004 · 006 · 007
 │   └── wireframes/               # telas em PNG, tema escuro e claro
 ├── src/
-│   ├── app/                      # Next.js: layout com os temas + landing page (rota /)
-│   ├── middleware.ts             # teste A/B: fixa a variante da manchete por cookie
-│   ├── landing/ab-test.ts        # manchetes A/B e sorteio
-│   ├── domain/schemas.ts         # modelo de domínio (Zod), inclui papéis e checkpoints do painel
-│   ├── domain/schemas.type-test.ts
-│   ├── server/qr-token.ts        # assina e verifica o QR do checkpoint (HMAC)
-│   ├── server/receipt-verifier.ts# cupom fiscal: SEFAZ + fallback local
-│   └── ui/theme.ts               # temas escuro e claro
+│   ├── app/                      # rotas Next.js: landing, /app, /s/<token>, /painel, /auth
+│   ├── domain/schemas.ts         # modelo de domínio (Zod): fonte única dos tipos
+│   ├── visitor/                  # regras e telas do app do visitante (scan, nível, missões)
+│   ├── painel/                   # regras do painel (acesso, checkpoints, missões, resgate, dashboard)
+│   ├── landing/                  # teste A/B, lista de espera, contagem regressiva
+│   ├── easter/                   # easter egg (horário e clima)
+│   ├── server/                   # Supabase no servidor, visitante, equipe, QR
+│   ├── ui/                       # temas e botão de tema
+│   └── middleware.ts             # sessão do Supabase, variante A/B e contagem de visitas
 ├── supabase/
-│   ├── migrations/               # tabelas, papéis e RLS do painel
+│   ├── migrations/               # 6 migrations, com as mesmas versões do projeto Supabase
 │   ├── seed.sql                  # lojas, checkpoints e recompensas de demonstração
-│   └── tests/                    # testes de banco (RLS) num Postgres temporário
+│   └── tests/                    # testes de banco num Postgres temporário
 ├── .github/
 │   ├── workflows/ci.yml          # tipos, lint, testes, build e banco em todo PR
 │   └── pull_request_template.md  # PR exige spec, ticket e critérios de aceite
-├── package.json · tsconfig.json · eslint.config.mjs · vitest.config.ts · .env.example
+└── package.json · tsconfig.json · eslint.config.mjs · vitest.config.ts · next.config.ts · .env.example
 ```
-
-## Status (13/11, noite)
-
-> Prazo: **MVP rodando em 14/11 às 12h** e **pitch de 90s às 13h**. Ordem de entrega e critérios em [`docs/11-plano-entrega-final.md`](docs/11-plano-entrega-final.md). Toda feature passa pelo fluxo spec-driven ([`CLAUDE.md`](CLAUDE.md)).
-
-**Pronto na `main`:**
-- ✅ Projeto Next.js 15 + React 19 com TypeScript strict, Zod, Vitest, ESLint e CI verde.
-- ✅ Landing page na rota `/` com os dois temas e teste A/B de manchete (spec 002, T1–T2).
-- ✅ Spec 003 do painel: casos de uso, diagrama de classes, requisitos funcionais e não funcionais, critérios de aceite e 9 issues (#3–#11).
-- ✅ Painel T1 (#3): schemas de papel, checkpoint, métricas e regra de validação do cupom de resgate.
-- ✅ Painel T2 (#4): migration com tabelas, papéis, RLS e seed, com testes de banco no CI.
-- ✅ Painel T4 (#6): assinatura e verificação HMAC do QR do checkpoint.
-- ✅ Painel T3 (#5): login por link mágico, `/painel` por papel (admin, lojista, sem acesso) e `/auth/callback`.
-- ✅ Projeto Supabase **growlithe** (`wmqymygwjppykjsejzah`, São Paulo) com a migration e o seed aplicados, RLS verificada no projeto real e advisors de segurança sem alertas.
-
-### Onde paramos (retomar daqui)
-
-Estado em **14/11, madrugada**: tudo na `main`, CI verde, banco Supabase com as 6 migrations aplicadas (mesmas versões do repositório).
-
-**Pronto:**
-- Landing com teste A/B, **lista de espera gravando leads** (spec 002) e passada de design (Impeccable).
-- **App do visitante (spec 004):** `/s/<token>` (escaneou → pontos), `/app` (nível, saldo, presença, missões) e `/app/missoes`. O QR é assinado e conferido **dentro do banco** (o segredo nunca sai de lá).
-- **Painel (spec 003):** login por papel, checkpoints e QR, **missões** (criar, listar, encerrar), **validar cupom de resgate** e **dashboard** (check-ins, visitantes, scans por checkpoint, missões, resgates e conversão do A/B).
-- **Easter egg de sexta-feira 13 (spec 006):** mascote dormindo de 00h às 06h e chuva forte em Palmas. Na demo: `?easter=noite` e `?easter=chuva`.
-
-**No ar:** **https://growlithe-flax.vercel.app** (Vercel, funções em São Paulo `gru1`, cada merge na `main` publica sozinho). O endereço `growlithe-rohti-vm.vercel.app` é protegido pela Vercel (pede login): **não use no pitch**.
-
-**Roteiro da manhã (antes do pitch):**
-1. **Supabase → Authentication → URL Configuration → Redirect URLs:** adicionar `http://localhost:3000/**` (e o endereço da Vercel).
-2. `pnpm.cmd dev` → abrir `/painel` → pedir o link com o e-mail do admin → clicar no e-mail. Depois, no SQL Editor: `select private.grant_staff('<e-mail>', 'admin', null);` e recarregar.
-3. No painel: **Checkpoints → Imprimir QR** da "Entrada principal" (é o check-in, vale 20 pts). Crie uma missão de teste em **Missões**.
-4. No celular: escanear o QR → entrar com outro e-mail → informar o nome → ver os pontos. Abrir `/app`.
-5. ✅ Vercel conectada e variáveis cadastradas. No Supabase, a Site URL e as Redirect URLs devem apontar para `https://growlithe-flax.vercel.app` (e `/**`).
-6. Gravar o pitch de 90s até 12h30 (roteiro em `docs/11-plano-entrega-final.md`).
-
-**Decisões tomadas de madrugada, para revisar (⚠️ nas specs):** spec 004 D9–D15 (pontos base 10/20, caça ao tesouro fora de ordem, missão completa 1 vez, multiplicador relâmpago, nome no primeiro login, endereços, celebração de nível) e spec 006 D3–D7 (mascote original, Open-Meteo, limiar de chuva, card no lugar do mapa, `?easter=`).
-
-**Pendente:** lista de e-mails de admin automática (falta saber os e-mails do time).
-
-**Dados de teste no banco (limpar antes do pitch, se quiser números zerados no dashboard):** 1 lead do QA (`qa-growlithe@example.com`) e 3 visitas de teste da landing. No SQL Editor:
-`delete from public.landing_leads where email = 'qa-growlithe@example.com'; delete from public.landing_visits;`
-
-**Em outro computador:** `git clone`, `pnpm install` e criar o `.env.local` com `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` (chave *publishable* em *Project Settings → API keys*).
