@@ -228,12 +228,25 @@ growlithe/
 - ✅ Painel T1 (#3): schemas de papel, checkpoint, métricas e regra de validação do cupom de resgate.
 - ✅ Painel T2 (#4): migration com tabelas, papéis, RLS e seed, com testes de banco no CI.
 - ✅ Painel T4 (#6): assinatura e verificação HMAC do QR do checkpoint.
+- ✅ Painel T3 (#5): login por link mágico, `/painel` por papel (admin, lojista, sem acesso) e `/auth/callback`.
+- ✅ Projeto Supabase **growlithe** (`wmqymygwjppykjsejzah`, São Paulo) com a migration e o seed aplicados, RLS verificada no projeto real e advisors de segurança sem alertas.
 
-**Próximos passos:**
-1. Aplicar a migration e o seed no projeto Supabase e promover o primeiro admin (`private.grant_staff`).
-2. Conectar o repositório à Vercel (deploy e preview por PR).
-3. Painel T3 (#5): login por link mágico e acesso ao `/painel` por papel.
-4. Painel T5 (#7): cadastrar checkpoints e imprimir os QR Codes.
+### Onde paramos (retomar daqui)
+
+Estado em 14/11, madrugada: tudo commitado na `main`, CI verde. **Nenhuma mudança local pendente.**
+
+1. ⏳ **Configurar o redirect do login:** no Supabase, *Authentication → URL Configuration → Redirect URLs*, adicionar `http://localhost:3000/**` (e o endereço da Vercel quando existir).
+2. ⏳ **Primeiro login e promoção a admin:** rodar `pnpm dev`, abrir `/painel`, pedir o link com o e-mail do time e abrir o e-mail (deve aparecer "Você não tem acesso ao painel"). Depois, no SQL Editor do Supabase: `select private.grant_staff('<e-mail>', 'admin', null);` e recarregar a página.
+3. Painel T5 (#7): cadastrar checkpoints e imprimir os QR Codes (usa `src/server/qr-token.ts`).
+4. Conectar o repositório à Vercel e cadastrar as variáveis do `.env.example`.
 5. Spec 004: check-in e missão por QR (scan, pontos e Home do visitante).
 6. Spec 002, T3–T5: formulário da lista de espera gravando leads.
 7. Painel T6–T9, resgate (spec 005) e Missão Relâmpago (spec 001), se houver tempo.
+
+**Em outro computador:** `git clone`, `pnpm install` e criar o `.env.local` a partir do `.env.example`:
+- `NEXT_PUBLIC_SUPABASE_URL=https://wmqymygwjppykjsejzah.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: a chave *publishable* em *Project Settings → API keys*.
+- `QR_SIGNING_SECRET`: 32+ caracteres aleatórios. Use o **mesmo** valor em todos os ambientes, senão os QR impressos deixam de valer.
+- `SUPABASE_SERVICE_ROLE_KEY`: chave *secret*, só servidor. Ainda não é usada pelo código.
+
+PRs #12, #13 e #14 estão abertos no GitHub, mas o conteúdo já está na `main`: podem ser fechados.
