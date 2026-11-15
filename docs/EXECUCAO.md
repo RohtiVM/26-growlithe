@@ -1,6 +1,6 @@
 # Instruções de execução
 
-Como instalar, configurar e rodar o Growlithe do zero, inclusive com um banco Supabase próprio. Para só ver funcionando, use o site publicado: **https://growlithe-flax.vercel.app**.
+Como instalar, configurar e rodar o Growlithe do zero, inclusive com um banco Supabase próprio. O site publicado durante a competição foi desativado; para ver funcionando, siga estes passos com um projeto Supabase próprio (plano gratuito).
 
 ## 1. Pré-requisitos
 

@@ -1,3 +1,5 @@
+> 📜 **Documento histórico da competição (14/11/2026).** O site `growlithe-flax.vercel.app`, o modo avaliador e o banco foram desativados depois do HackaRun. Para rodar o projeto, veja [`EXECUCAO.md`](EXECUCAO.md).
+
 # 12 · Pitch em vídeo de 90 segundos
 
 > Entrega de 14/11 (HackaRun 2026, Shopping Capim Dourado). Este documento resume e explica o que é dito no vídeo, bloco a bloco, e mostra onde cada afirmação está no MVP.
